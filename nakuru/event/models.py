@@ -2,7 +2,10 @@ import typing as T
 from enum import Enum
 from pydantic import BaseModel
 
-from nakuru.entities import Friend, Member, Anonymous, File, OfflineFile, Device
+from ..entities import Friend, Member, Anonymous, File, OfflineFile, Device
+from ..misc import CQParser
+
+parser = CQParser()
 
 class MessageItemType(Enum):
     FriendMessage = "FriendMessage"
@@ -17,10 +20,14 @@ class FriendMessage(BaseModel):
     sub_type: str
     message_id: int
     user_id: int
-    message: str
+    message: T.Union[str, list]
     raw_message: str
     font: int
     sender: Friend
+
+    def __init__(self, message: str, **_):
+        message = parser.parseChain(message)
+        super().__init__(message=message, **_)
 
 class GroupMessage(BaseModel):
     type: MessageItemType = "GroupMessage"
@@ -30,10 +37,14 @@ class GroupMessage(BaseModel):
     group_id: int
     user_id: int
     anonymous: T.Optional[Anonymous]
-    message: str
+    message: T.Union[str, list]
     raw_message: str
     font: int
     sender: Member
+
+    def __init__(self, message: str, **_):
+        message = parser.parseChain(message)
+        super().__init__(message=message, **_)
 
 class BotMessage(BaseModel):
     type: MessageItemType = "BotMessage"
@@ -52,6 +63,18 @@ MessageTypes = {
     "private": FriendMessage,
     "group": GroupMessage
 }
+
+class ForwardMessageSender(BaseModel):
+    nickname: str
+    user_id: int
+
+class ForwardMessageNode(BaseModel):
+    content: str
+    sender: ForwardMessageSender
+    time: int
+
+class ForwardMessages(BaseModel):
+    messages: T.List[ForwardMessageNode]
 
 class NoticeItemType(Enum):
     GroupFileUpload = "GroupFileUpload"
@@ -138,11 +161,11 @@ class Notify(BaseModel):
     type: NoticeItemType = "Notify"
     sub_type: str
     user_id: int
-    target_id: int
+    target_id: T.Optional[int]
     time: T.Optional[int]
     self_id: T.Optional[int]
     group_id: T.Optional[int]
-    honor_type: T.Optional[int]
+    honor_type: T.Optional[str]
 
 class GroupCardChange(BaseModel):
     type: NoticeItemType = "GroupCardChange"
