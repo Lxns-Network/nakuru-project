@@ -2,7 +2,7 @@
   <img width="256" src="./logo.png" alt="logo">
 
 # Nakuru Project
-一款为 [go-cqhttp](https://github.com/Mrs4s/go-cqhttp) 的正向 WebSocket 设计的 Python SDK
+一款为 [go-cqhttp](https://github.com/Mrs4s/go-cqhttp) 的正向 WebSocket 设计的 Python SDK，支持纯 CQ 码与消息链的转换处理
 
 在 [kuriyama](https://github.com/Lxns-Network/mirai-python-sdk) 的基础上改动
 
@@ -25,6 +25,7 @@ from nakuru import (
     GroupMessageRecall,
     FriendRequest
 )
+from nakuru.entities.components import Plain, Image
 
 app = CQHTTP(
     host="127.0.0.1",
@@ -34,10 +35,17 @@ app = CQHTTP(
 
 @app.receiver("GroupMessage")
 async def _(app: CQHTTP, source: GroupMessage):
-    if source.message == "戳我":
+    # 通过纯 CQ 码处理
+    if source.raw_message == "戳我":
         await app.sendGroupMessage(source.group_id, f"[CQ:poke,qq={source.user_id}]")
-    elif source.message == "test":
-        await app.sendGroupMessage(source.group_id, "test")
+    # 通过消息链处理
+    chain = source.message
+    if isinstance(chain[0], Plain):
+        if chain[0].text == "看":
+            await app.sendGroupMessage(source.group_id, [
+                Plain(text="给你看"),
+                Image(file="file:///D:/好康的.jpg", cache=False)
+            ])
 
 @app.receiver("GroupMessageRecall")
 async def _(app: CQHTTP, source: GroupMessageRecall):
