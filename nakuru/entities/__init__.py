@@ -1,4 +1,5 @@
-from .friend import Friend
-from .group import Member, Anonymous
-from .file import File, OfflineFile
-from .device import Device
+from .friend import *
+from .group import *
+from .file import *
+from .device import *
+from .others import *
