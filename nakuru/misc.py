@@ -99,7 +99,7 @@ class CQParser:
         text_array.pop(0)
         attribute_list = {}
         for _ in text_array:
-            regex_result = re.search(r"^(.*?)=([^\]]+)", _)
+            regex_result = re.search(r"^(.*?)=([\s\S]+)", _)
             k = regex_result.group(1)
             if k == "type":
                 k = "_type"
@@ -109,12 +109,12 @@ class CQParser:
 
     def parseChain(self, text):
         text = self.plainToCQ(text)
-        cqcode_list = re.findall(re.compile(r'(\[CQ:([\s\S]+?)])'), text)
+        cqcode_list = re.findall(r'(\[CQ:([\s\S]+?)])', text)
         chain = []
         for x in cqcode_list:
             message_type = re.search(r"^\[CQ\:(.*?)\,", x[0]).group(1)
             try:
-                chain.append(ComponentTypes[message_type].parse_obj(self.getAttributeList(text)))
+                chain.append(ComponentTypes[message_type].parse_obj(self.getAttributeList(x[1])))
             except:
                 Protocol.error(f"Cannot convert message type: {message_type}")
         return chain
