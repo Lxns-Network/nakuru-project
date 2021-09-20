@@ -1,12 +1,13 @@
-import re
 from pydantic import BaseModel
 from enum import Enum
 import typing as T
+import json
+import os
 
 from ..logger import Protocol
 
 class ComponentType(Enum):
-    Plain = "Plain" # 没有 [CQ:plain] 这种东西，所以直接导出纯文本
+    Plain = "Plain"
     Face = "Face"
     Record = "Record"
     Video = "Video"
@@ -25,10 +26,12 @@ class ComponentType(Enum):
     Poke = "Poke"
     Gift = "Gift"
     Forward = "Forward"
+    Node = "Node"
     Xml = "Xml"
     Json = "Json"
     CardImage = "CardImage"
     TTS = "TTS"
+    Unknown = "Unknown"
 
 class BaseMessageComponent(BaseModel):
     type: ComponentType
@@ -48,15 +51,28 @@ class BaseMessageComponent(BaseModel):
                                            .replace("]", "&#93;"))
         output += "]"
         return output
+    
+    def toDict(self):
+        data = dict()
+        for k, v in self.__dict__.items():
+            if k == "type" or v is None:
+                continue
+            if k == "_type":
+                k = "type"
+            data[k] = v
+        return {
+            "type": self.type.lower(),
+            "data": data
+        }
 
 class Plain(BaseMessageComponent):
     type: ComponentType = "Plain"
     text: str
 
-    def __init__(self, **_):
-        super().__init__(**_)
+    def __init__(self, text: str, **_):
+        super().__init__(text=text, **_)
 
-    def toString(self):
+    def toString(self): # 没有 [CQ:plain] 这种东西，所以直接导出纯文本
         return self.text.replace("&", "&amp;")\
                         .replace(",", "&#44;")\
                         .replace("[", "&#91;")\
@@ -78,11 +94,15 @@ class Record(BaseMessageComponent):
     proxy: T.Optional[bool] = True
     timeout: T.Optional[int] = 0
 
-    def __init__(self, **_):
+    def __init__(self, file: T.Optional[str], **_):
         for k in _.keys():
             if k == "url":
                 Protocol.warn(f"go-cqhttp doesn't support send {self.type} by {k}")
-        super().__init__(**_)
+        super().__init__(file=file, **_)
+    
+    @staticmethod
+    def fromFileSystem(path, **_):
+        return Record(file=f"file:///{os.path.abspath(path)}", **_)
 
 class Video(BaseMessageComponent):
     type: ComponentType = "Video"
@@ -90,11 +110,15 @@ class Video(BaseMessageComponent):
     cover: T.Optional[str]
     c: T.Optional[int] = 2
 
-    def __init__(self, **_):
+    def __init__(self, file: str, **_):
         for k in _.keys():
             if k == "c" and _[k] not in [2, 3]:
                 Protocol.warn(f"{k}={_[k]} doesn't match values")
-        super().__init__(**_)
+        super().__init__(file=file, **_)
+    
+    @staticmethod
+    def fromFileSystem(path, **_):
+        return Video(file=f"file:///{os.path.abspath(path)}", **_)
 
 class At(BaseMessageComponent):
     type: ComponentType = "At"
@@ -185,12 +209,16 @@ class Image(BaseMessageComponent):
     id: T.Optional[int] = 40000
     c: T.Optional[int] = 2
 
-    def __init__(self, **_):
+    def __init__(self, file: T.Optional[str], **_):
         for k in _.keys():
             if (k == "_type" and _[k] not in ["flash", "show", None]) or \
                     (k == "c" and _[k] not in [2, 3]):
                 Protocol.warn(f"{k}={_[k]} doesn't match values")
-        super().__init__(**_)
+        super().__init__(file=file, **_)
+    
+    @staticmethod
+    def fromFileSystem(path, **_):
+        return Image(file=f"file:///{os.path.abspath(path)}", **_)
 
 class Reply(BaseMessageComponent):
     type: ComponentType = "Reply"
@@ -232,6 +260,27 @@ class Forward(BaseMessageComponent):
     def __init__(self, **_):
         super().__init__(**_)
 
+class Node(BaseMessageComponent): # 该 component 仅支持使用 sendGroupForwardMessage 发送
+    type: ComponentType = "Node"
+    id: T.Optional[int]
+    name: T.Optional[str]
+    uin: T.Optional[int]
+    content: T.Optional[T.Union[str, list]]
+    seq: T.Optional[T.Union[str, list]] # 不清楚是什么
+    time: T.Optional[int]
+
+    def __init__(self, content: T.Union[str, list], **_):
+        if isinstance(content, list):
+            _content = ""
+            for chain in content:
+                _content += chain.toString()
+            content = _content
+        super().__init__(content=content, **_)
+    
+    def toString(self):
+        Protocol.warn(f"node doesn't support stringify")
+        return ""
+
 class Xml(BaseMessageComponent):
     type: ComponentType = "Xml"
     data: str
@@ -242,11 +291,13 @@ class Xml(BaseMessageComponent):
 
 class Json(BaseMessageComponent):
     type: ComponentType = "Json"
-    data: str
+    data: T.Union[str, dict]
     resid: T.Optional[int] = 0
 
-    def __init__(self, **_):
-        super().__init__(**_)
+    def __init__(self, data, **_):
+        if isinstance(data, dict):
+            data = json.dumps(data)
+        super().__init__(data=data, **_)
 
 class CardImage(BaseMessageComponent):
     type: ComponentType = "CardImage"
@@ -261,6 +312,10 @@ class CardImage(BaseMessageComponent):
 
     def __init__(self, **_):
         super().__init__(**_)
+    
+    @staticmethod
+    def fromFileSystem(path, **_):
+        return CardImage(file=f"file:///{os.path.abspath(path)}", **_)
 
 class TTS(BaseMessageComponent):
     type: ComponentType = "TTS"
@@ -268,6 +323,13 @@ class TTS(BaseMessageComponent):
 
     def __init__(self, **_):
         super().__init__(**_)
+
+class Unknown(BaseMessageComponent):
+    type: ComponentType = "Unknown"
+    text: str
+
+    def toString(self):
+        return ""
 
 ComponentTypes = {
     "plain": Plain,
@@ -289,8 +351,10 @@ ComponentTypes = {
     "poke": Poke,
     "gift": Gift,
     "forward": Forward,
+    "node": Node,
     "xml": Xml,
     "json": Json,
     "cardimage": CardImage,
-    "tts": TTS
+    "tts": TTS,
+    "unknown": Unknown
 }
