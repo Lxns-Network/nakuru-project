@@ -87,7 +87,7 @@ class Record(BaseMessageComponent):
 class Video(BaseMessageComponent):
     type: ComponentType = "Video"
     file: str
-    cover: str
+    cover: T.Optional[str]
     c: T.Optional[int] = 2
 
     def __init__(self, **_):
