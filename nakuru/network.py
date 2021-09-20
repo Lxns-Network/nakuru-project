@@ -8,7 +8,7 @@ import aiohttp
 
 class fetch:
     @staticmethod
-    async def http_post(url, data_map):
+    async def http_post(url, data_map=None):
         async with aiohttp.ClientSession() as session:
             async with session.post(url, json=data_map) as response:
                 data = await response.text(encoding="utf-8")
