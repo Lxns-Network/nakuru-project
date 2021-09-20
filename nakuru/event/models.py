@@ -59,6 +59,10 @@ class Message(BaseModel):  # getMessage
     message: str
     raw_message: str
 
+    def __init__(self, message: str, **_):
+        message = parser.parseChain(message)
+        super().__init__(message=message, **_)
+
 MessageTypes = {
     "private": FriendMessage,
     "group": GroupMessage
@@ -69,9 +73,15 @@ class ForwardMessageSender(BaseModel):
     user_id: int
 
 class ForwardMessageNode(BaseModel):
-    content: str
+    content: T.Union[str, list]
+    raw_content: T.Optional[str] # 本来没有的，用于表示原 content
     sender: ForwardMessageSender
     time: int
+
+    def __init__(self, content: str, **_):
+        raw_content = content
+        content = parser.parseChain(content)
+        super().__init__(content=content, raw_content=raw_content, **_)
 
 class ForwardMessages(BaseModel):
     messages: T.List[ForwardMessageNode]

@@ -2,6 +2,7 @@ import typing as T
 
 from .event.models import BotMessage, Message, Anonymous, ForwardMessages
 from .entities import *
+from .entities.components import Node
 from .network import fetch
 
 class CQHTTP_Protocol:
@@ -10,7 +11,7 @@ class CQHTTP_Protocol:
     async def sendFriendMessage(self,
                                 user_id: int,
                                 group_id: int,
-                                message,
+                                message: T.Union[str, list],
                                 auto_escape: bool = False) -> BotMessage:
         if isinstance(message, list):
             _message = ""
@@ -30,7 +31,7 @@ class CQHTTP_Protocol:
 
     async def sendGroupMessage(self,
                                group_id: int,
-                               message,
+                               message: T.Union[str, list],
                                auto_escape: bool = False) -> BotMessage:
         if isinstance(message, list):
             _message = ""
@@ -48,8 +49,10 @@ class CQHTTP_Protocol:
     
     async def sendGroupForwardMessage(self,
                                       group_id: int,
-                                      messages: list):
-        # TODO 构造 messages，现在也可以直接用该链接的格式发送：https://docs.go-cqhttp.org/cqcode/#%E5%90%88%E5%B9%B6%E8%BD%AC%E5%8F%91%E6%B6%88%E6%81%AF%E8%8A%82%E7%82%B9
+                                      messages: T.Union[list]) -> BotMessage:
+        for i in range(len(messages)):
+            if isinstance(messages[i], Node):
+                messages[i] = messages[i].toDict()
         result = await fetch.http_post(f"{self.baseurl_http}/send_group_forward_msg", {
             "group_id": group_id,
             "messages": messages
@@ -58,7 +61,7 @@ class CQHTTP_Protocol:
             return BotMessage.parse_obj(result["data"])
         return False
 
-    async def recall(self, message_id: int):
+    async def recall(self, message_id: int) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/delete_msg", {
             "message_id": message_id
         })
@@ -66,7 +69,7 @@ class CQHTTP_Protocol:
             return True
         return False
 
-    async def getMessage(self, message_id: int):
+    async def getMessage(self, message_id: int) -> Message:
         result = await fetch.http_post(f"{self.baseurl_http}/get_msg", {
             "message_id": message_id
         })
@@ -74,7 +77,7 @@ class CQHTTP_Protocol:
             return Message.parse_obj(result["data"])
         return False
     
-    async def getForwardMessage(self, message_id: int):
+    async def getForwardMessage(self, message_id: int) -> ForwardMessages:
         result = await fetch.http_post(f"{self.baseurl_http}/get_forward_msg", {
             "message_id": message_id
         })
@@ -82,7 +85,7 @@ class CQHTTP_Protocol:
             return ForwardMessages.parse_obj(result["data"])
         return False
     
-    async def getImage(self, file: str):
+    async def getImage(self, file: str) -> ImageFile:
         result = await fetch.http_post(f"{self.baseurl_http}/get_image", {
             "file": file
         })
@@ -93,7 +96,7 @@ class CQHTTP_Protocol:
     async def kick(self,
                    group_id: int,
                    user_id: int,
-                   reject_add_request: bool = False):
+                   reject_add_request: bool = False) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/set_group_kick", {
             "group_id": group_id,
             "user_id": user_id,
@@ -106,7 +109,7 @@ class CQHTTP_Protocol:
     async def mute(self,
                    group_id: int,
                    user_id: int,
-                   duration: int = 30 * 60):
+                   duration: int = 30 * 60) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/set_group_ban", {
             "group_id": group_id,
             "user_id": user_id,
@@ -116,14 +119,14 @@ class CQHTTP_Protocol:
             return True
         return False
     
-    async def unmute(self, group_id: int, user_id: int):
+    async def unmute(self, group_id: int, user_id: int) -> bool:
         return await self.mute(group_id, user_id, 0)
 
     async def muteAnonymous(self,
                             group_id: int,
                             flag: str,
                             duration: int = 30 * 60,
-                            anonymous: Anonymous = None):
+                            anonymous: Anonymous = None): # TODO
         result = await fetch.http_post(f"{self.baseurl_http}/set_group_anonymous_ban", {
             "group_id": group_id,
             "flag": flag,
@@ -135,7 +138,7 @@ class CQHTTP_Protocol:
     
     async def muteAll(self,
                       group_id: int,
-                      enable: bool = True):
+                      enable: bool = True) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/set_group_whole_ban", {
             "group_id": group_id,
             "enable": enable
@@ -147,7 +150,7 @@ class CQHTTP_Protocol:
     async def setGroupAdmin(self,
                             group_id: int,
                             user_id: int,
-                            enable: bool = True):
+                            enable: bool = True) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/set_group_admin", {
             "group_id": group_id,
             "user_id": user_id,
@@ -159,8 +162,7 @@ class CQHTTP_Protocol:
     
     async def setGroupAnonymous(self,
                                 group_id: int,
-                                user_id: int,
-                                enable: bool = True):  # TODO go-cqhttp 暂未支持
+                                enable: bool = True) -> bool:  # TODO go-cqhttp 暂未支持
         result = await fetch.http_post(f"{self.baseurl_http}/set_group_anonymous", {
             "group_id": group_id,
             "enable": enable
@@ -172,7 +174,7 @@ class CQHTTP_Protocol:
     async def setGroupCard(self,
                            group_id: int,
                            user_id: int,
-                           card: str = ""):
+                           card: str = "") -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/set_group_card", {
             "group_id": group_id,
             "user_id": user_id,
@@ -184,7 +186,7 @@ class CQHTTP_Protocol:
     
     async def setGroupName(self,
                            group_id: int,
-                           group_name: str):
+                           group_name: str) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/set_group_name", {
             "group_id": group_id,
             "group_name": group_name
@@ -195,7 +197,7 @@ class CQHTTP_Protocol:
     
     async def leave(self,
                     group_id: int,
-                    is_dismiss: bool = False):
+                    is_dismiss: bool = False) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/set_group_leave", {
             "group_id": group_id,
             "is_dismiss": is_dismiss
@@ -208,7 +210,7 @@ class CQHTTP_Protocol:
                                    group_id: int,
                                    user_id: int,
                                    special_title: str = "",
-                                   duration: int = -1):
+                                   duration: int = -1) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/set_group_special_title", {
             "group_id": group_id,
             "user_id": user_id,
@@ -222,7 +224,7 @@ class CQHTTP_Protocol:
     async def setFriendRequest(self,
                                flag: str,
                                approve: bool = True,
-                               remark: str = ""):
+                               remark: str = "") -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/set_friend_add_request", {
             "flag": flag,
             "approve": approve,
@@ -236,7 +238,7 @@ class CQHTTP_Protocol:
                               flag: str,
                               sub_type: str,
                               approve: bool = True,
-                              reason: str = ""):
+                              reason: str = "") -> bool:
         if sub_type not in ["add", "invite"]:
             return False
         result = await fetch.http_post(f"{self.baseurl_http}/set_group_add_request", {
@@ -249,13 +251,13 @@ class CQHTTP_Protocol:
             return True
         return False
     
-    async def getLoginInfo(self):
+    async def getLoginInfo(self) -> Bot:
         result = await fetch.http_post(f"{self.baseurl_http}/get_login_info")
         if result["status"] == "ok":
             return Bot.parse_obj(result["data"])
         return False
     
-    async def getQiDianAccountInfo(self):
+    async def getQiDianAccountInfo(self) -> QiDianAccount:
         result = await fetch.http_post(f"{self.baseurl_http}/qidian_get_account_info")
         if result["status"] == "ok":
             return QiDianAccount.parse_obj(result["data"])
@@ -263,7 +265,7 @@ class CQHTTP_Protocol:
     
     async def getStrangerInfo(self,
                               user_id: int,
-                              no_cache: bool = False):
+                              no_cache: bool = False) -> Stranger:
         result = await fetch.http_post(f"{self.baseurl_http}/get_stranger_info", {
             "user_id": user_id,
             "no_cache": no_cache
@@ -272,14 +274,14 @@ class CQHTTP_Protocol:
             return Stranger.parse_obj(result["data"])
         return False
     
-    async def getFriendList(self):
+    async def getFriendList(self) -> T.List[Friend]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_friend_list")
         if result["status"] == "ok":
             return [Friend.parse_obj(friend_info) for friend_info in result["data"]]
         return False
     
     async def deleteFriend(self,
-                         friend_id: int):
+                           friend_id: int) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/delete_friend", {
             "friend_id": friend_id
         })
@@ -289,7 +291,7 @@ class CQHTTP_Protocol:
     
     async def getGroupInfo(self,
                            group_id: int,
-                           no_cache: bool = False):
+                           no_cache: bool = False) -> Group:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_info", {
             "group_id": group_id,
             "no_cache": no_cache
@@ -298,7 +300,7 @@ class CQHTTP_Protocol:
             return Group.parse_obj(result["data"])
         return False
         
-    async def getGroupList(self):
+    async def getGroupList(self) -> T.List[Group]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_list")
         if result["status"] == "ok":
             return [Group.parse_obj(group_info) for group_info in result["data"]]
@@ -307,7 +309,7 @@ class CQHTTP_Protocol:
     async def getGroupMemberInfo(self,
                                  group_id: int,
                                  user_id: int,
-                                 no_cache: bool = False):
+                                 no_cache: bool = False) -> Member:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_member_info", {
             "group_id": group_id,
             "user_id": user_id,
@@ -318,7 +320,7 @@ class CQHTTP_Protocol:
         return False
     
     async def getGroupMemberList(self,
-                                 group_id: int):
+                                 group_id: int) -> Member:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_member_list", {
             "group_id": group_id
         })
@@ -337,14 +339,14 @@ class CQHTTP_Protocol:
             return Honor.parse_obj(result["data"])
         return False
     
-    async def canSendImage(self):
+    async def canSendImage(self) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/can_send_image")
         if result["status"] == "ok":
             if result["data"]["yes"]:
                 return True
         return False
     
-    async def canSendRecord(self):
+    async def canSendRecord(self) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/can_send_record")
         if result["status"] == "ok":
             if result["data"]["yes"]:
@@ -357,8 +359,7 @@ class CQHTTP_Protocol:
             return AppVersion.parse_obj(result["data"])
         return False
     
-    async def restartAPI(self,
-                         delay: int = 0):
+    async def restartAPI(self, delay: int = 0) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/set_restart", {
             "delay": delay
         })
@@ -369,7 +370,7 @@ class CQHTTP_Protocol:
     async def setGroupPortrait(self,
                                group_id: int,
                                file: str,
-                               cache: int):
+                               cache: int) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/set_restart", {
             "group_id": group_id,
             "file": file,
@@ -388,14 +389,13 @@ class CQHTTP_Protocol:
             return OCR.parse_obj(result["data"])
         return False
     
-    async def getGroupSystemMessage(self):
+    async def getGroupSystemMessage(self) -> GroupSystemMessage:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_system_msg")
         if result["status"] == "ok":
             return GroupSystemMessage.parse_obj(result["data"])
         return False
     
-    async def uploadGroupFile(self,
-                              group_id: int):
+    async def uploadGroupFile(self, group_id: int) -> GroupFileSystem:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_file_system_info", {
             "group_id": group_id
         })
@@ -403,8 +403,7 @@ class CQHTTP_Protocol:
             return GroupFileSystem.parse_obj(result["data"])
         return False
     
-    async def getGroupRootFiles(self,
-                                group_id: int):
+    async def getGroupRootFiles(self, group_id: int) -> GroupFileTree:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_root_files", {
             "group_id": group_id
         })
@@ -414,7 +413,7 @@ class CQHTTP_Protocol:
     
     async def getGroupFilesByFolder(self,
                                     group_id: int,
-                                    folder_id: str):
+                                    folder_id: str) -> GroupFileTree:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_root_files", {
             "group_id": group_id,
             "folder_id": folder_id
@@ -426,7 +425,7 @@ class CQHTTP_Protocol:
     async def getGroupFileURL(self,
                               group_id: int,
                               file_id: str,
-                              busid: int):
+                              busid: int) -> str:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_root_files", {
             "group_id": group_id,
             "file_id": file_id,
@@ -436,14 +435,13 @@ class CQHTTP_Protocol:
             return result["data"]["url"]
         return False
     
-    async def uploadGroupFile(self):
+    async def getStatus(self) -> AppStatus:
         result = await fetch.http_post(f"{self.baseurl_http}/get_status")
         if result["status"] == "ok":
             return AppStatus.parse_obj(result["data"])
         return False
     
-    async def getGroupAtAllRemain(self,
-                                  group_id: int):
+    async def getGroupAtAllRemain(self, group_id: int) -> AtAllRemain:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_at_all_remain", {
             "group_id": group_id
         })

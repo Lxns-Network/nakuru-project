@@ -38,21 +38,16 @@ import re
 from .entities.components import ComponentTypes
 
 class CQParser:
-    """
-    消息链 / CQ 码转换
-    """
     def __replaceChar(self, string, char, start, end):
         string = list(string)
         del (string[start:end])
         string.insert(start, char)
         return ''.join(string)
 
-    # 获得文本中每一个CQ码的起始和结束位置
+    # 获得文本中每一个 CQ 码的起始和结束位置
     def __getCQIndex(self, text):
         cqIndex = []
-        cqIndex.clear()
-        p = re.compile("(\[CQ:(.+?)])")
-        for m in p.finditer(text):
+        for m in re.compile("(\[CQ:(.+?)])").finditer(text):
             cqIndex.append((m.start(), m.end()))
         cqIndex.append((len(text), len(text)))
         return cqIndex
@@ -71,26 +66,24 @@ class CQParser:
             text = text.replace("&#44;", ",")
         return text
 
-    # 将CQ码以外的文本转换成类型为“plain”的CQ码
+    # 将纯文本转换成类型为 plain 的 CQ 码
     def plainToCQ(self, text):
         i = j = k = 0
         cqIndex = self.__getCQIndex(text)
         while i < len(cqIndex):
             if i > 0:
-                if i == 1: k += 1
-                else: j += 1
+                if i == 1:
+                    k += 1
+                else:
+                    j += 1
+            cqIndex = self.__getCQIndex(text)
             if i > 0:
-                cqIndex = self.__getCQIndex(text)
-                source_text = text[cqIndex[j][k]:cqIndex[j + 1][0]]
-                if source_text != "":
-                    source_text = self.escape(source_text)
-                    text = self.__replaceChar(text, f"[CQ:plain,text={source_text}]", cqIndex[j][k], cqIndex[j + 1][0])
+                l, r = cqIndex[j][k], cqIndex[j + 1][0]
             else:
-                cqIndex = self.__getCQIndex(text)
-                source_text = text[0:cqIndex[0][0]]
-                if (source_text != ""):
-                    source_text = self.escape(source_text)
-                    text = self.__replaceChar(text, f"[CQ:plain,text={source_text}]", 0, cqIndex[0][0])
+                l, r = 0, cqIndex[0][0]
+            source_text = text[l:r]
+            if source_text != "":
+                text = self.__replaceChar(text, f"[CQ:plain,text={self.escape(source_text)}]", l, r)
             i += 1
         return text
     
@@ -116,5 +109,6 @@ class CQParser:
             try:
                 chain.append(ComponentTypes[message_type].parse_obj(self.getAttributeList(x[1])))
             except:
+                chain.append(ComponentTypes["unknown"].parse_obj({"text": message_type}))
                 Protocol.error(f"Cannot convert message type: {message_type}")
         return chain
