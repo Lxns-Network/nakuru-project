@@ -10,8 +10,13 @@ class CQHTTP_Protocol:
     async def sendFriendMessage(self,
                                 user_id: int,
                                 group_id: int,
-                                message: str,
+                                message,
                                 auto_escape: bool = False) -> BotMessage:
+        if isinstance(message, list):
+            _message = ""
+            for chain in message:
+                _message += chain.toString()
+            message = _message
         result = await fetch.http_post(f"{self.baseurl_http}/send_private_msg", {
             "user_id": user_id,
             "group_id": group_id,
@@ -30,7 +35,6 @@ class CQHTTP_Protocol:
         if isinstance(message, list):
             _message = ""
             for chain in message:
-                print(chain)
                 _message += chain.toString()
             message = _message
         result = await fetch.http_post(f"{self.baseurl_http}/send_group_msg", {
