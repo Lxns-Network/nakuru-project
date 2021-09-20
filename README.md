@@ -10,7 +10,7 @@
 </div>
 
 ## 食用方法
-将 `nakuru` 文件夹移至 Python 的 `Lib/site-packages` 目录下。
+使用 `pip install git+https://github.com/Lxns-Network/nakuru-project.git` 安装。
 
 需要将 go-cqhttp 的正向 WebSocket 与 HTTP 配置项开启。
 
