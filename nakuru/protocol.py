@@ -289,6 +289,21 @@ class CQHTTP_Protocol:
             return True
         return False
     
+    async def getUnidirectionalFriendList(self) -> T.List[Friend]:
+        result = await fetch.http_post(f"{self.baseurl_http}/get_unidirectional_friend_list")
+        if result["status"] == "ok":
+            return [Friend.parse_obj(friend_info) for friend_info in result["data"]]
+        return False
+    
+    async def deleteUnidirectionalFriend(self,
+                                         user_id: int) -> bool:
+        result = await fetch.http_post(f"{self.baseurl_http}/delete_unidirectional_friend", {
+            "user_id": user_id
+        })
+        if result["status"] == "ok":
+            return True
+        return False
+    
     async def getGroupInfo(self,
                            group_id: int,
                            no_cache: bool = False) -> Group:

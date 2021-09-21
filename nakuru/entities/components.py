@@ -204,6 +204,7 @@ class Image(BaseMessageComponent):
     type: ComponentType = "Image"
     file: T.Optional[str]
     _type: T.Optional[str]
+    subType: T.Optional[int]
     url: T.Optional[str]
     cache: T.Optional[bool] = True
     id: T.Optional[int] = 40000

@@ -56,14 +56,14 @@ class CQParser:
     def escape(self, text, isEscape=True):
         if isEscape:
             text = text.replace("&", "&amp;")
+            text = text.replace(",", "&#44;")
             text = text.replace("[", "&#91;")
             text = text.replace("]", "&#93;")
-            text = text.replace(",", "&#44;")
         else:
             text = text.replace("&amp;", "&")
+            text = text.replace("&#44;", ",")
             text = text.replace("&#91;", "[")
             text = text.replace("&#93;", "]")
-            text = text.replace("&#44;", ",")
         return text
 
     # 将纯文本转换成类型为 plain 的 CQ 码

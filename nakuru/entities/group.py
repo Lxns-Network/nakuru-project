@@ -19,6 +19,7 @@ class Member(BaseModel):
     unfriendly: Optional[bool]
     title_expire_time: Optional[int]
     card_changeable: Optional[bool]
+    shut_up_timestamp: Optional[int]
 
 class Anonymous(BaseModel):
     id: int
