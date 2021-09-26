@@ -3,7 +3,6 @@ import typing as T
 from .event.models import BotMessage, Message, Anonymous, ForwardMessages
 from .entities import *
 from .entities.components import Node
-from .logger import Event
 from .network import fetch
 
 
