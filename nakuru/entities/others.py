@@ -82,3 +82,12 @@ class JoinRequest(BaseModel):
 class GroupSystemMessage(BaseModel):
     invited_requests: Optional[InvitedRequest]
     join_requests: Optional[JoinRequest]
+
+class VipInfo(BaseModel):
+    user_id: int
+    nickname: str
+    level: int
+    level_speed: float
+    vip_level: str
+    vip_growth_speed: int
+    vip_growth_total: int
