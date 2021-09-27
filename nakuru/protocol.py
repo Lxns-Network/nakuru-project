@@ -533,18 +533,36 @@ class CQHTTP_Protocol:
             return True
         return False
 
-    async def getEssenceMessageList(self):
-        # TODO 获取精华消息列表
-        pass
+    async def getEssenceMessageList(self, group_id: int) -> EssenceMessage:
+        result = await fetch.http_post(f"{self.baseurl_http}/get_essence_msg_list", {
+            "group_id": group_id
+        })
+        if result["status"] == "ok":
+            return EssenceMessage.parse_obj(result["data"])
+        return False
 
-    async def checkURLSafety(self):
-        # TODO 检查链接安全性
-        pass
+    async def checkURLSafety(self, url: str) -> int:
+        result = await fetch.http_post(f"{self.baseurl_http}/check_url_safely", {
+            "url": url
+        })
+        if result["status"] == "ok":
+            return result["level"]
+        return False
 
-    async def getModelShow(self):
-        # TODO 获取在线机型
-        pass
+    async def getModelShow(self, model: str) -> ModelShou:
+        result = await fetch.http_post(f"{self.baseurl_http}/_get_model_show", {
+            "model": model
+        })
+        if result["status"] == "ok":
+            return ModelShou.parse_obj(result["data"])
+        return False
 
-    async def setModelShow(self):
-        # TODO 设置在线机型
-        pass
+    async def setModelShow(self, model: str, model_show: str) -> bool:
+        result = await fetch.http_post(f"{self.baseurl_http}/_set_model_show", {
+            "model": model,
+            "model_show": model_show
+        })
+        if result["status"] == "ok":
+            return True
+        return False
+
