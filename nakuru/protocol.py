@@ -1,8 +1,6 @@
-import typing as T
-
-from .event.models import BotMessage, Message, Anonymous, ForwardMessages
 from .entities import *
 from .entities.components import Node
+from .event.models import BotMessage, Message, ForwardMessages
 from .network import fetch
 
 

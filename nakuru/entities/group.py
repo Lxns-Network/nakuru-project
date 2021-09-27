@@ -1,6 +1,8 @@
-from pydantic import BaseModel
-from typing import Optional
 import typing as T
+from typing import Optional
+
+from pydantic import BaseModel
+
 
 class Member(BaseModel):
     user_id: int
@@ -21,10 +23,12 @@ class Member(BaseModel):
     card_changeable: Optional[bool]
     shut_up_timestamp: Optional[int]
 
+
 class Anonymous(BaseModel):
     id: int
     name: str
     flag: str
+
 
 class Group(BaseModel):
     group_id: int
@@ -35,12 +39,14 @@ class Group(BaseModel):
     member_count: int
     max_member_count: int
 
+
 class HonorListNode(BaseModel):
     user_id: int
     nickname: str
     avatar: str
     description: Optional[str]
     day_count: Optional[int]
+
 
 class Honor(BaseModel):
     group_id: int
@@ -50,6 +56,7 @@ class Honor(BaseModel):
     legend_list: Optional[T.List[HonorListNode]]
     strong_newbie_list: Optional[T.List[HonorListNode]]
     emotion_list: Optional[T.List[HonorListNode]]
+
 
 class AtAllRemain(BaseModel):
     can_at_all: bool

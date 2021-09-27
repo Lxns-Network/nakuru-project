@@ -2,6 +2,7 @@
   <img width="256" src="./logo.png" alt="logo">
 
 # Nakuru Project
+
 一款为 [go-cqhttp](https://github.com/Mrs4s/go-cqhttp) 的正向 WebSocket 设计的 Python SDK，支持纯 CQ 码与消息链的转换处理
 
 在 [kuriyama](https://github.com/Lxns-Network/mirai-python-sdk) 的基础上改动
@@ -10,11 +11,13 @@
 </div>
 
 ## 食用方法
+
 使用 `pip install git+https://github.com/Lxns-Network/nakuru-project.git` 安装。
 
 需要将 go-cqhttp 的正向 WebSocket 与 HTTP 配置项开启。
 
 ## 示例
+
 没有文档，源码就是文档。
 
 ```python
@@ -64,4 +67,5 @@ app.run()
 ```
 
 ## 贡献
+
 欢迎 PR 代码或提交 Issue，项目现在还存在着许多问题。

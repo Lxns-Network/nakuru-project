@@ -10,6 +10,7 @@ app = CQHTTP(
     http_port=5700
 )
 
+
 @app.receiver("GroupMessage")
 async def _(app: CQHTTP, source: GroupMessage):
     # 方法 1
@@ -61,5 +62,6 @@ async def _(app: CQHTTP, source: GroupMessage):
             }
         }
     ])
+
 
 app.run()

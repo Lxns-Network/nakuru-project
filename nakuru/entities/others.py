@@ -1,14 +1,18 @@
+from typing import Optional
+
 from pydantic import BaseModel, Field
-from typing import Optional, List
+
 
 class Bot(BaseModel):
     user_id: int
     nickname: str
 
+
 class QiDianAccount(BaseModel):
     master_id: int
     ext_name: str
     create_time: int
+
 
 class Stranger(BaseModel):
     user_id: int
@@ -16,6 +20,7 @@ class Stranger(BaseModel):
     sex: str
     age: int
     qid: str
+
 
 class AppVersion(BaseModel):
     app_name: str
@@ -33,6 +38,7 @@ class AppVersion(BaseModel):
     version: str
     protocol: int
 
+
 class NetworkStatistics(BaseModel):
     packet_received: int
     packet_sent: int
@@ -41,6 +47,7 @@ class NetworkStatistics(BaseModel):
     message_sent: int
     disconnect_times: int
     lost_times: int
+
 
 class AppStatus(BaseModel):
     app_initialized: bool
@@ -51,14 +58,17 @@ class AppStatus(BaseModel):
     good: bool
     stat: NetworkStatistics
 
+
 class TextDetection(BaseModel):
     text: str
     confidence: int
     coordinates: str
 
+
 class OCR(BaseModel):
     texts: TextDetection
     language: str
+
 
 class InvitedRequest(BaseModel):
     request_id: int
@@ -68,6 +78,7 @@ class InvitedRequest(BaseModel):
     group_name: str
     checked: bool
     actor: int
+
 
 class JoinRequest(BaseModel):
     request_id: int
@@ -79,9 +90,11 @@ class JoinRequest(BaseModel):
     checked: bool
     actor: int
 
+
 class GroupSystemMessage(BaseModel):
     invited_requests: Optional[InvitedRequest]
     join_requests: Optional[JoinRequest]
+
 
 class VipInfo(BaseModel):
     user_id: int
@@ -92,6 +105,7 @@ class VipInfo(BaseModel):
     vip_growth_speed: int
     vip_growth_total: int
 
+
 class EssenceMessage(BaseModel):
     sender_id: int
     sender_nick: int
@@ -100,6 +114,7 @@ class EssenceMessage(BaseModel):
     operator_nick: int
     operator_time: int
     message_id: int
+
 
 class ModelShow(BaseModel):
     model_show: str

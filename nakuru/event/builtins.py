@@ -1,11 +1,14 @@
-from pydantic import BaseModel
 import typing as T
+
+from pydantic import BaseModel
+
 
 class Depend:
     def __init__(self, func, middlewares=[], cache=True):
         self.func = func
         self.middlewares = middlewares
         self.cache = cache
+
 
 class ExecutorProtocol(BaseModel):
     callable: T.Callable
@@ -15,8 +18,10 @@ class ExecutorProtocol(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
+
 from . import InternalEvent
 from pydantic import BaseModel
+
 
 class UnexpectedException(BaseModel):
     error: Exception

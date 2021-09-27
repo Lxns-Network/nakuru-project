@@ -1,11 +1,12 @@
+import os
+import sys
+
 import logbook
-from logbook import Logger, StreamHandler
 from logbook import (
     INFO,
     DEBUG
 )
-import os
-import sys
+from logbook import Logger, StreamHandler
 
 logbook.set_datetime_format('local')
 stream_handler = StreamHandler(sys.stdout, level=INFO if not os.environ.get("MIRAI_DEBUG") else DEBUG)

@@ -1,24 +1,25 @@
-import aiohttp
 import asyncio
-import inspect
 import copy
-
+import inspect
 from contextlib import AsyncExitStack
-from typing import Callable, NamedTuple, Awaitable, Any, List, Dict
 from functools import partial
+from typing import Callable, NamedTuple, Awaitable, Any, List, Dict
+
+import aiohttp
 from async_lru import alru_cache
 
 from .event import InternalEvent, ExternalEvent
-from .event.models import MessageTypes, NoticeTypes, RequestTypes, Friend, Member,  GroupMessageRecall
 from .event.builtins import ExecutorProtocol, Depend
+from .event.enums import ExternalEvents
 from .event.models import (
     FriendMessage, GroupMessage, MessageItemType
 )
-from .event.enums import ExternalEvents
-from .misc import argument_signature, raiser, TRACEBACKED
-from .protocol import CQHTTP_Protocol
+from .event.models import MessageTypes, NoticeTypes, RequestTypes, Friend, Member
 from .logger import Event, Protocol
 from .logger import Session as SessionLogger
+from .misc import argument_signature, raiser, TRACEBACKED
+from .protocol import CQHTTP_Protocol
+
 
 class CQHTTP(CQHTTP_Protocol):
     event: Dict[
@@ -166,7 +167,7 @@ class CQHTTP(CQHTTP_Protocol):
                 stack.enter_context(normal_middleware)
 
             return await self.run_func(executor_protocol.callable, **CallParams, **extra_parameter)
-    
+
     def run(self):
         loop = asyncio.get_event_loop()
         self.queue = asyncio.Queue(loop=loop)
@@ -198,7 +199,7 @@ class CQHTTP(CQHTTP_Protocol):
         def receiver_warpper(func: Callable):
             if not inspect.iscoroutinefunction(func):
                 raise TypeError("event body must be a coroutine function.")
-            
+
             self.event.setdefault(event_name, [])
             self.event[event_name].append(ExecutorProtocol(
                 callable=func,
@@ -222,8 +223,8 @@ class CQHTTP(CQHTTP_Protocol):
         elif event_value in class_list:  # message
             return event_value.__name__
         elif isinstance(event_value, (  # enum
-            MessageItemType,
-            ExternalEvents
+                MessageItemType,
+                ExternalEvents
         )):
             return event_value.name
         else:
@@ -256,7 +257,7 @@ class CQHTTP(CQHTTP_Protocol):
             if name != event_context.name:
                 raise ValueError("cannot look up a non-listened event.")
             return event_context.body
-        
+
         return {
             event_class.value for event_name, event_class in ExternalEvents.__members__.items()
         }
@@ -266,7 +267,7 @@ class CQHTTP(CQHTTP_Protocol):
             if name != event_context.name:
                 raise ValueError("cannot look up a non-listened event.")
             return event_context.body
-        
+
         return {
             event_class.value: partial(warpper, copy.copy(event_name)) \
             for event_name, event_class in ExternalEvents.__members__.items()

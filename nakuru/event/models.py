@@ -1,5 +1,6 @@
 import typing as T
 from enum import Enum
+
 from pydantic import BaseModel
 
 from ..entities import Friend, Member, Anonymous, File, OfflineFile, Device
@@ -7,11 +8,13 @@ from ..misc import CQParser
 
 parser = CQParser()
 
+
 class MessageItemType(Enum):
     FriendMessage = "FriendMessage"
     GroupMessage = "GroupMessage"
     BotMessage = "BotMessage"
     Message = "Message"
+
 
 class FriendMessage(BaseModel):
     type: MessageItemType = "FriendMessage"
@@ -28,6 +31,7 @@ class FriendMessage(BaseModel):
     def __init__(self, message: str, **_):
         message = parser.parseChain(message)
         super().__init__(message=message, **_)
+
 
 class GroupMessage(BaseModel):
     type: MessageItemType = "GroupMessage"
@@ -46,9 +50,11 @@ class GroupMessage(BaseModel):
         message = parser.parseChain(message)
         super().__init__(message=message, **_)
 
+
 class BotMessage(BaseModel):
     type: MessageItemType = "BotMessage"
     message_id: int
+
 
 class Message(BaseModel):  # getMessage
     type: MessageItemType = "Message"
@@ -63,18 +69,21 @@ class Message(BaseModel):  # getMessage
         message = parser.parseChain(message)
         super().__init__(message=message, **_)
 
+
 MessageTypes = {
     "private": FriendMessage,
     "group": GroupMessage
 }
 
+
 class ForwardMessageSender(BaseModel):
     nickname: str
     user_id: int
 
+
 class ForwardMessageNode(BaseModel):
     content: T.Union[str, list]
-    raw_content: T.Optional[str] # 本来没有的，用于表示原 content
+    raw_content: T.Optional[str]  # 本来没有的，用于表示原 content
     sender: ForwardMessageSender
     time: int
 
@@ -83,8 +92,10 @@ class ForwardMessageNode(BaseModel):
         content = parser.parseChain(content)
         super().__init__(content=content, raw_content=raw_content, **_)
 
+
 class ForwardMessages(BaseModel):
     messages: T.List[ForwardMessageNode]
+
 
 class NoticeItemType(Enum):
     GroupFileUpload = "GroupFileUpload"
@@ -101,6 +112,7 @@ class NoticeItemType(Enum):
     ClientStatusChange = "ClientStatusChange"
     EssenceMessageChange = "EssenceMessageChange"
 
+
 class GroupFileUpload(BaseModel):
     type: NoticeItemType = "GroupFileUpload"
     time: int
@@ -109,6 +121,7 @@ class GroupFileUpload(BaseModel):
     user_id: int
     file: File
 
+
 class GroupAdminChange(BaseModel):
     type: NoticeItemType = "GroupAdminChange"
     time: int
@@ -116,6 +129,7 @@ class GroupAdminChange(BaseModel):
     sub_type: str
     group_id: int
     user_id: int
+
 
 class GroupMemberDecrease(BaseModel):
     type: NoticeItemType = "GroupMemberDecrease"
@@ -126,6 +140,7 @@ class GroupMemberDecrease(BaseModel):
     operator_id: int
     user_id: int
 
+
 class GroupMemberIncrease(BaseModel):
     type: NoticeItemType = "GroupMemberIncrease"
     time: int
@@ -134,6 +149,7 @@ class GroupMemberIncrease(BaseModel):
     group_id: int
     operator_id: int
     user_id: int
+
 
 class GroupMemberBan(BaseModel):
     type: NoticeItemType = "GroupMemberBan"
@@ -145,11 +161,13 @@ class GroupMemberBan(BaseModel):
     user_id: int
     duration: int
 
+
 class FriendAdd(BaseModel):
     type: NoticeItemType = "FriendAdd"
     time: int
     self_id: int
     user_id: int
+
 
 class GroupMessageRecall(BaseModel):
     type: NoticeItemType = "GroupMessageRecall"
@@ -160,12 +178,14 @@ class GroupMessageRecall(BaseModel):
     operator_id: int
     message_id: int
 
+
 class FriendMessageRecall(BaseModel):
     type: NoticeItemType = "FriendMessageRecall"
     time: int
     self_id: int
     user_id: int
     message_id: int
+
 
 class Notify(BaseModel):
     type: NoticeItemType = "Notify"
@@ -177,6 +197,7 @@ class Notify(BaseModel):
     group_id: T.Optional[int]
     honor_type: T.Optional[str]
 
+
 class GroupCardChange(BaseModel):
     type: NoticeItemType = "GroupCardChange"
     group_id: int
@@ -184,15 +205,18 @@ class GroupCardChange(BaseModel):
     card_new: str
     card_old: str
 
+
 class FriendOfflineFile(BaseModel):
     type: NoticeItemType = "FriendOfflineFile"
     user_id: int
     file: OfflineFile
 
+
 class ClientStatusChange(BaseModel):
     type: NoticeItemType = "ClientStatusChange"
     client: Device
     online: bool
+
 
 class EssenceMessageChange(BaseModel):
     type: NoticeItemType = "EssenceMessageChange"
@@ -200,6 +224,7 @@ class EssenceMessageChange(BaseModel):
     sender_id: int
     operator_id: int
     message_id: int
+
 
 NoticeTypes = {
     "group_upload": GroupFileUpload,
@@ -217,9 +242,11 @@ NoticeTypes = {
     "essence": EssenceMessageChange
 }
 
+
 class RequestItemType(Enum):
     FriendRequest = "FriendRequest"
     GroupRequest = "GroupRequest"
+
 
 class FriendRequest(BaseModel):
     type: RequestItemType = "FriendRequest"
@@ -228,6 +255,7 @@ class FriendRequest(BaseModel):
     user_id: int
     comment: str
     flag: str
+
 
 class GroupRequest(BaseModel):
     type: RequestItemType = "GroupRequest"
@@ -238,6 +266,7 @@ class GroupRequest(BaseModel):
     user_id: int
     comment: str
     flag: str
+
 
 RequestTypes = {
     "friend": FriendRequest,

@@ -9,8 +9,10 @@ Parameter = namedtuple("Parameter", ["name", "annotation", "default"])
 
 TRACEBACKED = os.urandom(32)
 
+
 def raiser(error):
     raise error
+
 
 def protocol_log(func):
     async def wrapper(*args, **kwargs):
@@ -24,6 +26,7 @@ def protocol_log(func):
 
     return wrapper
 
+
 def argument_signature(callable_target) -> T.List[Parameter]:
     return [
         Parameter(
@@ -34,8 +37,10 @@ def argument_signature(callable_target) -> T.List[Parameter]:
         for name, param in dict(inspect.signature(callable_target).parameters).items()
     ]
 
+
 import re
 from .entities.components import ComponentTypes
+
 
 class CQParser:
     def __replaceChar(self, string, char, start, end):
@@ -86,7 +91,7 @@ class CQParser:
                 text = self.__replaceChar(text, f"[CQ:plain,text={self.escape(source_text)}]", l, r)
             i += 1
         return text
-    
+
     def getAttributeList(self, text):
         text_array = text.split(",")
         text_array.pop(0)

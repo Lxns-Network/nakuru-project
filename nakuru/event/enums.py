@@ -1,5 +1,7 @@
-from .models import *
 from enum import Enum
+
+from .models import *
+
 
 class ExternalEvents(Enum):
     GroupFileUpload = GroupFileUpload
@@ -18,6 +20,7 @@ class ExternalEvents(Enum):
 
     FriendRequest = FriendRequest
     GroupRequest = GroupRequest
+
 
 class ExternalEventTypes(Enum):
     GroupFileUpload = "GroupFileUpload"

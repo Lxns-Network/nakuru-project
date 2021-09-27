@@ -1,5 +1,7 @@
-from pydantic import BaseModel
 import typing as T
+
+from pydantic import BaseModel
+
 
 class Friend(BaseModel):
     user_id: int
