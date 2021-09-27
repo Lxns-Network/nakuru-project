@@ -13,7 +13,7 @@ class CQHTTP_Protocol:
                                 user_id: int,
                                 group_id: int,
                                 message: T.Union[str, list],
-                                auto_escape: bool = False) -> BotMessage:
+                                auto_escape: bool = False) -> T.Union[BotMessage, bool]:
         if isinstance(message, list):
             _message = ""
             for chain in message:
@@ -32,7 +32,7 @@ class CQHTTP_Protocol:
     async def sendGroupMessage(self,
                                group_id: int,
                                message: T.Union[str, list],
-                               auto_escape: bool = False) -> BotMessage:
+                               auto_escape: bool = False) -> T.Union[BotMessage, bool]:
         if isinstance(message, list):
             _message = ""
             for chain in message:
@@ -49,7 +49,7 @@ class CQHTTP_Protocol:
 
     async def sendGroupForwardMessage(self,
                                       group_id: int,
-                                      messages: T.Union[list]) -> BotMessage:
+                                      messages: T.Union[list]) -> T.Union[BotMessage, bool]:
         for i in range(len(messages)):
             if isinstance(messages[i], Node):
                 messages[i] = messages[i].toDict()
@@ -69,7 +69,7 @@ class CQHTTP_Protocol:
             return True
         return False
 
-    async def getMessage(self, message_id: int) -> Message:
+    async def getMessage(self, message_id: int) -> T.Union[Message, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_msg", {
             "message_id": message_id
         })
@@ -77,7 +77,7 @@ class CQHTTP_Protocol:
             return Message.parse_obj(result["data"])
         return False
 
-    async def getForwardMessage(self, message_id: int) -> ForwardMessages:
+    async def getForwardMessage(self, message_id: int) -> T.Union[ForwardMessages, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_forward_msg", {
             "message_id": message_id
         })
@@ -85,7 +85,7 @@ class CQHTTP_Protocol:
             return ForwardMessages.parse_obj(result["data"])
         return False
 
-    async def getImage(self, file: str) -> ImageFile:
+    async def getImage(self, file: str) -> T.Union[ImageFile, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_image", {
             "file": file
         })
@@ -251,13 +251,13 @@ class CQHTTP_Protocol:
             return True
         return False
 
-    async def getLoginInfo(self) -> Bot:
+    async def getLoginInfo(self) -> T.Union[Bot, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_login_info")
         if result["status"] == "ok":
             return Bot.parse_obj(result["data"])
         return False
 
-    async def getQiDianAccountInfo(self) -> QiDianAccount:
+    async def getQiDianAccountInfo(self) -> T.Union[QiDianAccount, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/qidian_get_account_info")
         if result["status"] == "ok":
             return QiDianAccount.parse_obj(result["data"])
@@ -265,7 +265,7 @@ class CQHTTP_Protocol:
 
     async def getStrangerInfo(self,
                               user_id: int,
-                              no_cache: bool = False) -> Stranger:
+                              no_cache: bool = False) -> T.Union[Stranger, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_stranger_info", {
             "user_id": user_id,
             "no_cache": no_cache
@@ -274,7 +274,7 @@ class CQHTTP_Protocol:
             return Stranger.parse_obj(result["data"])
         return False
 
-    async def getFriendList(self) -> T.List[Friend]:
+    async def getFriendList(self) -> T.Union[List[Friend], bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_friend_list")
         if result["status"] == "ok":
             return [Friend.parse_obj(friend_info) for friend_info in result["data"]]
@@ -289,7 +289,7 @@ class CQHTTP_Protocol:
             return True
         return False
 
-    async def getUnidirectionalFriendList(self) -> T.List[Friend]:
+    async def getUnidirectionalFriendList(self) -> T.Union[List[Friend], bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_unidirectional_friend_list")
         if result["status"] == "ok":
             return [Friend.parse_obj(friend_info) for friend_info in result["data"]]
@@ -306,7 +306,7 @@ class CQHTTP_Protocol:
 
     async def getGroupInfo(self,
                            group_id: int,
-                           no_cache: bool = False) -> Group:
+                           no_cache: bool = False) -> T.Union[Group, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_info", {
             "group_id": group_id,
             "no_cache": no_cache
@@ -315,7 +315,7 @@ class CQHTTP_Protocol:
             return Group.parse_obj(result["data"])
         return False
 
-    async def getGroupList(self) -> T.List[Group]:
+    async def getGroupList(self) -> T.Union[List[Group], bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_list")
         if result["status"] == "ok":
             return [Group.parse_obj(group_info) for group_info in result["data"]]
@@ -324,7 +324,7 @@ class CQHTTP_Protocol:
     async def getGroupMemberInfo(self,
                                  group_id: int,
                                  user_id: int,
-                                 no_cache: bool = False) -> Member:
+                                 no_cache: bool = False) -> T.Union[Member, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_member_info", {
             "group_id": group_id,
             "user_id": user_id,
@@ -335,7 +335,7 @@ class CQHTTP_Protocol:
         return False
 
     async def getGroupMemberList(self,
-                                 group_id: int) -> Member:
+                                 group_id: int) -> T.Union[List[Member], bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_member_list", {
             "group_id": group_id
         })
@@ -345,7 +345,7 @@ class CQHTTP_Protocol:
 
     async def getGroupHonorInfo(self,
                                 group_id: int,
-                                type: str) -> Honor:
+                                type: str) -> T.Union[Honor, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_honor_info", {
             "group_id": group_id,
             "type": type
@@ -368,7 +368,7 @@ class CQHTTP_Protocol:
                 return True
         return False
 
-    async def getVersionInfo(self) -> AppVersion:
+    async def getVersionInfo(self) -> T.Union[AppVersion, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_version_info")
         if result["status"] == "ok":
             return AppVersion.parse_obj(result["data"])
@@ -396,7 +396,7 @@ class CQHTTP_Protocol:
         return False
 
     async def ocrImage(self,
-                       image: str) -> OCR:
+                       image: str) -> T.Union[OCR, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/ocr_image", {
             "image": image
         })
@@ -404,13 +404,13 @@ class CQHTTP_Protocol:
             return OCR.parse_obj(result["data"])
         return False
 
-    async def getGroupSystemMessage(self) -> GroupSystemMessage:
+    async def getGroupSystemMessage(self) -> T.Union[GroupSystemMessage, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_system_msg")
         if result["status"] == "ok":
             return GroupSystemMessage.parse_obj(result["data"])
         return False
 
-    async def uploadGroupFile(self, group_id: int) -> GroupFileSystem:
+    async def uploadGroupFile(self, group_id: int) -> T.Union[GroupFileSystem, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_file_system_info", {
             "group_id": group_id
         })
@@ -418,7 +418,7 @@ class CQHTTP_Protocol:
             return GroupFileSystem.parse_obj(result["data"])
         return False
 
-    async def getGroupRootFiles(self, group_id: int) -> GroupFileTree:
+    async def getGroupRootFiles(self, group_id: int) -> T.Union[GroupFileTree, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_root_files", {
             "group_id": group_id
         })
@@ -428,7 +428,7 @@ class CQHTTP_Protocol:
 
     async def getGroupFilesByFolder(self,
                                     group_id: int,
-                                    folder_id: str) -> GroupFileTree:
+                                    folder_id: str) -> T.Union[GroupFileTree, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_root_files", {
             "group_id": group_id,
             "folder_id": folder_id
@@ -440,7 +440,7 @@ class CQHTTP_Protocol:
     async def getGroupFileURL(self,
                               group_id: int,
                               file_id: str,
-                              busid: int) -> str:
+                              busid: int) -> T.Union[str, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_root_files", {
             "group_id": group_id,
             "file_id": file_id,
@@ -450,13 +450,13 @@ class CQHTTP_Protocol:
             return result["data"]["url"]
         return False
 
-    async def getStatus(self) -> AppStatus:
+    async def getStatus(self) -> T.Union[AppStatus, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_status")
         if result["status"] == "ok":
             return AppStatus.parse_obj(result["data"])
         return False
 
-    async def getGroupAtAllRemain(self, group_id: int) -> AtAllRemain:
+    async def getGroupAtAllRemain(self, group_id: int) -> T.Union[AtAllRemain, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_at_all_remain", {
             "group_id": group_id
         })
@@ -464,7 +464,7 @@ class CQHTTP_Protocol:
             return AtAllRemain.parse_obj(result["data"])
         return False
 
-    async def getVipInfo(self, user_id: int) -> VipInfo:
+    async def getVipInfo(self, user_id: int) -> T.Union[VipInfo, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/_get_vip_info", {
             "user_id": user_id
         })
@@ -499,7 +499,7 @@ class CQHTTP_Protocol:
             return True
         return False
 
-    async def getOnlineClients(self, no_cashe: bool) -> Device:
+    async def getOnlineClients(self, no_cashe: bool) -> T.Union[List[Device], bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_online_clients", {
             "no_cache": no_cashe
         })
@@ -507,7 +507,8 @@ class CQHTTP_Protocol:
             return [Device.parse_obj(device) for device in result["data"]["clients"]]
         return False
 
-    async def getGroupMessageHistory(self, group_id: int, message_seq: Optional[int] = None) -> Message:
+    async def getGroupMessageHistory(self, group_id: int, message_seq: Optional[int] = None) -> T.Union[List[Message],
+                                                                                                        bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_msg_history", {
             "message_seq": message_seq,
             "group_id": group_id
@@ -517,7 +518,7 @@ class CQHTTP_Protocol:
             return [Message.parse_obj(message) for message in result["data"]["messages"]]
         return False
 
-    async def setEssenceMessage(self, message_id: int):
+    async def setEssenceMessage(self, message_id: int) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/set_essence_msg", {
             "message_id": message_id
         })  # 草,为什么只有手机看得到
@@ -525,7 +526,7 @@ class CQHTTP_Protocol:
             return True
         return False
 
-    async def deleteEssenceMessage(self,message_id: int):
+    async def deleteEssenceMessage(self, message_id: int) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/delete_essence_msg", {
             "message_id": message_id
         })  # 这个我没测试过
@@ -533,7 +534,7 @@ class CQHTTP_Protocol:
             return True
         return False
 
-    async def getEssenceMessageList(self, group_id: int) -> EssenceMessage:
+    async def getEssenceMessageList(self, group_id: int) -> T.Union[EssenceMessage, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_essence_msg_list", {
             "group_id": group_id
         })
@@ -549,7 +550,7 @@ class CQHTTP_Protocol:
             return result["level"]
         return False
 
-    async def getModelShow(self, model: str) -> ModelShou:
+    async def getModelShow(self, model: str) -> T.Union[ModelShou, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/_get_model_show", {
             "model": model
         })
@@ -565,4 +566,3 @@ class CQHTTP_Protocol:
         if result["status"] == "ok":
             return True
         return False
-
