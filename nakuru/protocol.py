@@ -550,12 +550,12 @@ class CQHTTP_Protocol:
             return result["level"]
         return False
 
-    async def getModelShow(self, model: str) -> T.Union[List[ModelShows], bool]:
+    async def getModelShow(self, model: str) -> T.Union[List[ModelShow], bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/_get_model_show", {
             "model": model
         })
         if result["status"] == "ok":
-            return [ModelShows.parse_obj(_model) for _model in result["data"]["variants"]]
+            return [ModelShow.parse_obj(_model) for _model in result["data"]["variants"]]
         return False
 
     async def setModelShow(self, model: str, model_show: str) -> bool:

@@ -101,6 +101,6 @@ class EssenceMessage(BaseModel):
     operator_time: int
     message_id: int
 
-class ModelShows(BaseModel):
+class ModelShow(BaseModel):
     model_show: str
     need_pay: bool
