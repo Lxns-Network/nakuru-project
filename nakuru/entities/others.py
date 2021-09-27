@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 
 class Bot(BaseModel):
     user_id: int
@@ -91,3 +91,16 @@ class VipInfo(BaseModel):
     vip_level: str
     vip_growth_speed: int
     vip_growth_total: int
+
+class EssenceMessage(BaseModel):
+    sender_id: int
+    sender_nick: int
+    sender_time: int
+    operator_id: int
+    operator_nick: int
+    operator_time: int
+    message_id: int
+
+class ModelShow(BaseModel):
+    model_show: str
+    need_pay: bool
