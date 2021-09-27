@@ -101,9 +101,6 @@ class EssenceMessage(BaseModel):
     operator_time: int
     message_id: int
 
-class ModelInfo(BaseModel):
+class ModelShows(BaseModel):
     model_show: str
     need_pay: bool
-
-class ModelShows(BaseModel):
-    variants: List[ModelInfo]
