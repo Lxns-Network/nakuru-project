@@ -105,5 +105,5 @@ class ModelInfo(BaseModel):
     model_show: str
     need_pay: bool
 
-class ModelShou(BaseModel):
+class ModelShows(BaseModel):
     variants: List[ModelInfo]
