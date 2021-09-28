@@ -111,7 +111,7 @@ class Record(BaseMessageComponent):
         return Record(file=f"file:///{os.path.abspath(path)}", **_)
 
     @staticmethod
-    def fromUrl(url: str, **_):
+    def fromURL(url: str, **_):
         if url.startswith("http://") or url.startswith("https://"):
             return Record(file=url, **_)
         raise Exception("not a valid url")
@@ -134,7 +134,7 @@ class Video(BaseMessageComponent):
         return Video(file=f"file:///{os.path.abspath(path)}", **_)
 
     @staticmethod
-    def fromUrl(url: str, **_):
+    def fromURL(url: str, **_):
         if url.startswith("http://") or url.startswith("https://"):
             return Video(file=url, **_)
         raise Exception("not a valid url")
