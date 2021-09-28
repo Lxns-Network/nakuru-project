@@ -6,19 +6,20 @@ import os
 
 from ..logger import Protocol
 
+
 class ComponentType(Enum):
     Plain = "Plain"
     Face = "Face"
     Record = "Record"
     Video = "Video"
     At = "At"
-    RPS = "RPS" # TODO
-    Dice = "Dice" # TODO
-    Shake = "Shake" # TODO
-    Anonymous = "Anonymous" # TODO
+    RPS = "RPS"  # TODO
+    Dice = "Dice"  # TODO
+    Shake = "Shake"  # TODO
+    Anonymous = "Anonymous"  # TODO
     Share = "Share"
-    Contact = "Contact" # TODO
-    Location = "Location" # TODO
+    Contact = "Contact"  # TODO
+    Location = "Location"  # TODO
     Music = "Music"
     Image = "Image"
     Reply = "Reply"
@@ -33,6 +34,7 @@ class ComponentType(Enum):
     TTS = "TTS"
     Unknown = "Unknown"
 
+
 class BaseMessageComponent(BaseModel):
     type: ComponentType
 
@@ -45,13 +47,13 @@ class BaseMessageComponent(BaseModel):
                 k = "type"
             if isinstance(v, bool):
                 v = 1 if v else 0
-            output += ",%s=%s" % (k, str(v).replace("&", "&amp;")\
-                                           .replace(",", "&#44;")\
-                                           .replace("[", "&#91;")\
-                                           .replace("]", "&#93;"))
+            output += ",%s=%s" % (k, str(v).replace("&", "&amp;") \
+                                  .replace(",", "&#44;") \
+                                  .replace("[", "&#91;") \
+                                  .replace("]", "&#93;"))
         output += "]"
         return output
-    
+
     def toDict(self):
         data = dict()
         for k, v in self.__dict__.items():
@@ -65,6 +67,7 @@ class BaseMessageComponent(BaseModel):
             "data": data
         }
 
+
 class Plain(BaseMessageComponent):
     type: ComponentType = "Plain"
     text: str
@@ -72,11 +75,12 @@ class Plain(BaseMessageComponent):
     def __init__(self, text: str, **_):
         super().__init__(text=text, **_)
 
-    def toString(self): # 没有 [CQ:plain] 这种东西，所以直接导出纯文本
-        return self.text.replace("&", "&amp;")\
-                        .replace(",", "&#44;")\
-                        .replace("[", "&#91;")\
-                        .replace("]", "&#93;")
+    def toString(self):  # 没有 [CQ:plain] 这种东西，所以直接导出纯文本
+        return self.text.replace("&", "&amp;") \
+            .replace(",", "&#44;") \
+            .replace("[", "&#91;") \
+            .replace("]", "&#93;")
+
 
 class Face(BaseMessageComponent):
     type: ComponentType = "Face"
@@ -84,6 +88,7 @@ class Face(BaseMessageComponent):
 
     def __init__(self, **_):
         super().__init__(**_)
+
 
 class Record(BaseMessageComponent):
     type: ComponentType = "Record"
@@ -97,12 +102,20 @@ class Record(BaseMessageComponent):
     def __init__(self, file: T.Optional[str], **_):
         for k in _.keys():
             if k == "url":
-                Protocol.warn(f"go-cqhttp doesn't support send {self.type} by {k}")
+                Protocol.warn("you should put url into file parameter")
+                # Protocol.warn(f"go-cqhttp doesn't support send {self.type} by {k}")
         super().__init__(file=file, **_)
-    
+
     @staticmethod
     def fromFileSystem(path, **_):
         return Record(file=f"file:///{os.path.abspath(path)}", **_)
+
+    @staticmethod
+    def fromURL(url: str, **_):
+        if url.startswith("http://") or url.startswith("https://"):
+            return Record(file=url, **_)
+        raise Exception("not a valid url")
+
 
 class Video(BaseMessageComponent):
     type: ComponentType = "Video"
@@ -115,10 +128,17 @@ class Video(BaseMessageComponent):
             if k == "c" and _[k] not in [2, 3]:
                 Protocol.warn(f"{k}={_[k]} doesn't match values")
         super().__init__(file=file, **_)
-    
+
     @staticmethod
     def fromFileSystem(path, **_):
         return Video(file=f"file:///{os.path.abspath(path)}", **_)
+
+    @staticmethod
+    def fromURL(url: str, **_):
+        if url.startswith("http://") or url.startswith("https://"):
+            return Video(file=url, **_)
+        raise Exception("not a valid url")
+
 
 class At(BaseMessageComponent):
     type: ComponentType = "At"
@@ -128,30 +148,35 @@ class At(BaseMessageComponent):
     def __init__(self, **_):
         super().__init__(**_)
 
-class RPS(BaseMessageComponent): # TODO
+
+class RPS(BaseMessageComponent):  # TODO
     type: ComponentType = "RPS"
 
     def __init__(self, **_):
         super().__init__(**_)
 
-class Dice(BaseMessageComponent): # TODO
+
+class Dice(BaseMessageComponent):  # TODO
     type: ComponentType = "Dice"
 
     def __init__(self, **_):
         super().__init__(**_)
 
-class Shake(BaseMessageComponent): # TODO
+
+class Shake(BaseMessageComponent):  # TODO
     type: ComponentType = "Shake"
 
     def __init__(self, **_):
         super().__init__(**_)
 
-class Anonymous(BaseMessageComponent): # TODO
+
+class Anonymous(BaseMessageComponent):  # TODO
     type: ComponentType = "Anonymous"
     ignore: T.Optional[bool]
 
     def __init__(self, **_):
         super().__init__(**_)
+
 
 class Share(BaseMessageComponent):
     type: ComponentType = "Share"
@@ -163,9 +188,10 @@ class Share(BaseMessageComponent):
     def __init__(self, **_):
         super().__init__(**_)
 
-class Contact(BaseMessageComponent): # TODO
+
+class Contact(BaseMessageComponent):  # TODO
     type: ComponentType = "Contact"
-    _type: str # type 字段冲突
+    _type: str  # type 字段冲突
     id: T.Optional[int]
 
     def __init__(self, **_):
@@ -174,7 +200,8 @@ class Contact(BaseMessageComponent): # TODO
                 Protocol.warn(f"{k}={_[k]} doesn't match values")
         super().__init__(**_)
 
-class Location(BaseMessageComponent): # TODO
+
+class Location(BaseMessageComponent):  # TODO
     type: ComponentType = "Location"
     lat: float
     lon: float
@@ -183,6 +210,7 @@ class Location(BaseMessageComponent): # TODO
 
     def __init__(self, **_):
         super().__init__(**_)
+
 
 class Music(BaseMessageComponent):
     type: ComponentType = "Music"
@@ -200,6 +228,7 @@ class Music(BaseMessageComponent):
                 Protocol.warn(f"{k}={_[k]} doesn't match values")
         super().__init__(**_)
 
+
 class Image(BaseMessageComponent):
     type: ComponentType = "Image"
     file: T.Optional[str]
@@ -216,10 +245,11 @@ class Image(BaseMessageComponent):
                     (k == "c" and _[k] not in [2, 3]):
                 Protocol.warn(f"{k}={_[k]} doesn't match values")
         super().__init__(file=file, **_)
-    
+
     @staticmethod
     def fromFileSystem(path, **_):
         return Image(file=f"file:///{os.path.abspath(path)}", **_)
+
 
 class Reply(BaseMessageComponent):
     type: ComponentType = "Reply"
@@ -232,6 +262,7 @@ class Reply(BaseMessageComponent):
     def __init__(self, **_):
         super().__init__(**_)
 
+
 class RedBag(BaseMessageComponent):
     type: ComponentType = "RedBag"
     title: str
@@ -239,12 +270,14 @@ class RedBag(BaseMessageComponent):
     def __init__(self, **_):
         super().__init__(**_)
 
+
 class Poke(BaseMessageComponent):
     type: ComponentType = "Poke"
     qq: int
 
     def __init__(self, **_):
         super().__init__(**_)
+
 
 class Gift(BaseMessageComponent):
     type: ComponentType = "Gift"
@@ -254,6 +287,7 @@ class Gift(BaseMessageComponent):
     def __init__(self, **_):
         super().__init__(**_)
 
+
 class Forward(BaseMessageComponent):
     type: ComponentType = "Forward"
     id: str
@@ -261,13 +295,14 @@ class Forward(BaseMessageComponent):
     def __init__(self, **_):
         super().__init__(**_)
 
-class Node(BaseMessageComponent): # 该 component 仅支持使用 sendGroupForwardMessage 发送
+
+class Node(BaseMessageComponent):  # 该 component 仅支持使用 sendGroupForwardMessage 发送
     type: ComponentType = "Node"
     id: T.Optional[int]
     name: T.Optional[str]
     uin: T.Optional[int]
     content: T.Optional[T.Union[str, list]]
-    seq: T.Optional[T.Union[str, list]] # 不清楚是什么
+    seq: T.Optional[T.Union[str, list]]  # 不清楚是什么
     time: T.Optional[int]
 
     def __init__(self, content: T.Union[str, list], **_):
@@ -277,10 +312,11 @@ class Node(BaseMessageComponent): # 该 component 仅支持使用 sendGroupForwa
                 _content += chain.toString()
             content = _content
         super().__init__(content=content, **_)
-    
+
     def toString(self):
         Protocol.warn(f"node doesn't support stringify")
         return ""
+
 
 class Xml(BaseMessageComponent):
     type: ComponentType = "Xml"
@@ -289,6 +325,7 @@ class Xml(BaseMessageComponent):
 
     def __init__(self, **_):
         super().__init__(**_)
+
 
 class Json(BaseMessageComponent):
     type: ComponentType = "Json"
@@ -299,6 +336,7 @@ class Json(BaseMessageComponent):
         if isinstance(data, dict):
             data = json.dumps(data)
         super().__init__(data=data, **_)
+
 
 class CardImage(BaseMessageComponent):
     type: ComponentType = "CardImage"
@@ -313,10 +351,11 @@ class CardImage(BaseMessageComponent):
 
     def __init__(self, **_):
         super().__init__(**_)
-    
+
     @staticmethod
     def fromFileSystem(path, **_):
         return CardImage(file=f"file:///{os.path.abspath(path)}", **_)
+
 
 class TTS(BaseMessageComponent):
     type: ComponentType = "TTS"
@@ -325,12 +364,14 @@ class TTS(BaseMessageComponent):
     def __init__(self, **_):
         super().__init__(**_)
 
+
 class Unknown(BaseMessageComponent):
     type: ComponentType = "Unknown"
     text: str
 
     def toString(self):
         return ""
+
 
 ComponentTypes = {
     "plain": Plain,
