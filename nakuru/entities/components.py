@@ -247,8 +247,26 @@ class Image(BaseMessageComponent):
         super().__init__(file=file, **_)
 
     @staticmethod
+    def fromURL(url: str, **_):
+        if url.startswith("http://") or url.startswith("https://"):
+            return Video(file=url, **_)
+        raise Exception("not a valid url")
+
+    @staticmethod
     def fromFileSystem(path, **_):
         return Image(file=f"file:///{os.path.abspath(path)}", **_)
+
+    @staticmethod
+    def fromBase64(base64: str, **_):
+        return Image(f"base64://{base64}", **_)
+
+    @staticmethod
+    def fromBytes(byte: bytes):
+        return Image.fromBase64(base64.b64encode(byte).decode())
+
+    @staticmethod
+    def fromIO(IO):
+        return Image.fromBytes(IO.read())
 
 
 class Reply(BaseMessageComponent):
