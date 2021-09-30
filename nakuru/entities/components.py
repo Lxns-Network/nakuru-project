@@ -249,7 +249,7 @@ class Image(BaseMessageComponent):
     @staticmethod
     def fromURL(url: str, **_):
         if url.startswith("http://") or url.startswith("https://"):
-            return Video(file=url, **_)
+            return Image(file=url, **_)
         raise Exception("not a valid url")
 
     @staticmethod
