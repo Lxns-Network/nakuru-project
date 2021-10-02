@@ -441,7 +441,7 @@ class CQHTTP_Protocol:
                               group_id: int,
                               file_id: str,
                               busid: int) -> T.Union[str, bool]:
-        result = await fetch.http_post(f"{self.baseurl_http}/get_group_root_files", {
+        result = await fetch.http_post(f"{self.baseurl_http}/get_group_file_url", {
             "group_id": group_id,
             "file_id": file_id,
             "busid": busid
