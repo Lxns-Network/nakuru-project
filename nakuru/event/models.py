@@ -15,7 +15,7 @@ class MessageItemType(Enum):
 
 class FriendMessage(BaseModel):
     type: MessageItemType = "FriendMessage"
-    time: str
+    time: int
     self_id: str
     sub_type: str
     message_id: int
@@ -41,6 +41,7 @@ class GroupMessage(BaseModel):
     raw_message: str
     font: int
     sender: Member
+    time: int
 
     def __init__(self, message: str, **_):
         message = parser.parseChain(message)
