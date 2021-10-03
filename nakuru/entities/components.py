@@ -77,7 +77,6 @@ class Plain(BaseMessageComponent):
 
     def toString(self):  # 没有 [CQ:plain] 这种东西，所以直接导出纯文本
         return self.text.replace("&", "&amp;") \
-            .replace(",", "&#44;") \
             .replace("[", "&#91;") \
             .replace("]", "&#93;")
 
