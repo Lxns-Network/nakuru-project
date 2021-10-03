@@ -5,13 +5,13 @@ import typing as T
 class Member(BaseModel):
     user_id: int
     nickname: str
-    card: str
+    card: T.Optional[str]
     sex: str
     age: int
     area: str
     level: str
-    role: str
-    title: str
+    role: T.Optional[str]
+    title: T.Optional[str]
     # 以下是 getGroupMemberInfo 返回的更多结果
     group_id: Optional[int]
     join_time: Optional[int]
