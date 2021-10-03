@@ -238,6 +238,8 @@ class Image(BaseMessageComponent):
     cache: T.Optional[bool] = True
     id: T.Optional[int] = 40000
     c: T.Optional[int] = 2
+    # 额外
+    path: T.Optional[str]
 
     def __init__(self, file: T.Optional[str], **_):
         for k in _.keys():
