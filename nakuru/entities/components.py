@@ -97,6 +97,8 @@ class Record(BaseMessageComponent):
     cache: T.Optional[bool] = True
     proxy: T.Optional[bool] = True
     timeout: T.Optional[int] = 0
+    # 额外
+    path: T.Optional[str]
 
     def __init__(self, file: T.Optional[str], **_):
         for k in _.keys():
@@ -107,7 +109,7 @@ class Record(BaseMessageComponent):
 
     @staticmethod
     def fromFileSystem(path, **_):
-        return Record(file=f"file:///{os.path.abspath(path)}", **_)
+        return Record(file=f"file:///{os.path.abspath(path)}", path=path, **_)
 
     @staticmethod
     def fromURL(url: str, **_):
@@ -121,6 +123,8 @@ class Video(BaseMessageComponent):
     file: str
     cover: T.Optional[str]
     c: T.Optional[int] = 2
+    # 额外
+    path: T.Optional[str]
 
     def __init__(self, file: str, **_):
         for k in _.keys():
@@ -130,7 +134,7 @@ class Video(BaseMessageComponent):
 
     @staticmethod
     def fromFileSystem(path, **_):
-        return Video(file=f"file:///{os.path.abspath(path)}", **_)
+        return Video(file=f"file:///{os.path.abspath(path)}", path=path, **_)
 
     @staticmethod
     def fromURL(url: str, **_):
