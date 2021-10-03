@@ -256,7 +256,7 @@ class Image(BaseMessageComponent):
 
     @staticmethod
     def fromFileSystem(path, **_):
-        return Image(file=f"file:///{os.path.abspath(path)}", **_)
+        return Image(file=f"file:///{os.path.abspath(path)}", path=path, **_)
 
     @staticmethod
     def fromBase64(base64: str, **_):
