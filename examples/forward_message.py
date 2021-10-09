@@ -55,7 +55,7 @@ async def _(app: CQHTTP, source: GroupMessage):
                     },
                     {
                         "type": "image",
-                        "data": {"file": "file:///./src/1.jpg"}
+                        "data": {"file": "file:///D:/src/1.jpg"}  # 此处需要绝对路径
                     }
                 ]
             }
