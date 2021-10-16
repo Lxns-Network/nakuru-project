@@ -44,7 +44,7 @@ async def _(app: CQHTTP, source: GroupMessage):
         if chain[0].text == "看":
             await app.sendGroupMessage(source.group_id, [
                 Plain(text="给你看"),
-                Image(file="file:///D:/好康的.jpg", cache=False)
+                Image.fromFileSystem("D:/好康的.jpg")
             ])
 
 @app.receiver("GroupMessageRecall")
