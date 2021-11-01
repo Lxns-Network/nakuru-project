@@ -1,8 +1,9 @@
-from pydantic import BaseModel
-from enum import Enum
-import typing as T
 import json
 import os
+import typing as T
+from enum import Enum
+
+from pydantic import BaseModel
 
 from ..logger import Protocol
 
@@ -145,8 +146,15 @@ class Video(BaseMessageComponent):
 
 class At(BaseMessageComponent):
     type: ComponentType = "At"
-    qq: int
+    qq: T.Union[int, str]  # 此处str为all时代表所有人
     name: T.Optional[str]
+
+    def __init__(self, **_):
+        super().__init__(**_)
+
+
+class AtAll(At):
+    qq: str = "all"
 
     def __init__(self, **_):
         super().__init__(**_)
