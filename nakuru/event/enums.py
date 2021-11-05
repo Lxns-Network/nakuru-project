@@ -2,6 +2,8 @@ from .models import *
 from enum import Enum
 
 class ExternalEvents(Enum):
+    AppInitEvent = AppInitEvent
+
     GroupFileUpload = GroupFileUpload
     GroupAdminChange = GroupAdminChange
     GroupMemberDecrease = GroupMemberDecrease
@@ -20,6 +22,8 @@ class ExternalEvents(Enum):
     GroupRequest = GroupRequest
 
 class ExternalEventTypes(Enum):
+    AppInitEvent = "AppInitEvent"
+
     GroupFileUpload = "GroupFileUpload"
     GroupAdminChange = "GroupAdminChange"
     GroupMemberDecrease = "GroupMemberDecrease"

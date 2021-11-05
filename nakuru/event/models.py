@@ -7,6 +7,9 @@ from ..misc import CQParser
 
 parser = CQParser()
 
+class AppInitEvent(BaseModel):
+    pass
+
 class MessageItemType(Enum):
     FriendMessage = "FriendMessage"
     GroupMessage = "GroupMessage"

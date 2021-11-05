@@ -172,6 +172,11 @@ class CQHTTP(CQHTTP_Protocol):
         self.queue = asyncio.Queue(loop=loop)
         loop.create_task(self.ws_event())
         loop.create_task(self.event_runner())
+
+        loop.run_until_complete(self.queue.put(InternalEvent(
+            name=self.getEventCurrentName("AppInitEvent"),
+            body={}
+        )))
         try:
             for start_callable in self.lifecycle['start']:
                 loop.run_until_complete(self.run_func(start_callable, self))
