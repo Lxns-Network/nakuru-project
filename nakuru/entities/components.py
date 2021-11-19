@@ -72,11 +72,14 @@ class BaseMessageComponent(BaseModel):
 class Plain(BaseMessageComponent):
     type: ComponentType = "Plain"
     text: str
+    convert: T.Optional[bool] = True  # 若为 False 则直接发送未转换 CQ 码的消息
 
-    def __init__(self, text: str, **_):
-        super().__init__(text=text, **_)
+    def __init__(self, text: str, convert: bool = True, **_):
+        super().__init__(text=text, convert=convert, **_)
 
     def toString(self):  # 没有 [CQ:plain] 这种东西，所以直接导出纯文本
+        if not self.convert:
+            return self.text
         return self.text.replace("&", "&amp;") \
             .replace("[", "&#91;") \
             .replace("]", "&#93;")
