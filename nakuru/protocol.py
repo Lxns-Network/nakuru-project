@@ -49,7 +49,7 @@ class CQHTTP_Protocol:
 
     async def sendGroupForwardMessage(self,
                                       group_id: int,
-                                      messages: T.Union[list]) -> T.Union[BotMessage, bool]:
+                                      messages: list) -> T.Union[BotMessage, bool]:
         for i in range(len(messages)):
             if isinstance(messages[i], Node):
                 messages[i] = messages[i].toDict()
@@ -565,4 +565,74 @@ class CQHTTP_Protocol:
         })
         if result["status"] == "ok":
             return True
+        return False
+
+    async def getGuildServiceProfile(self) -> T.Union[BotGuild, bool]:
+        '''
+        获取频道系统内BOT的资料
+        '''
+        result = await fetch.http_post(f"{self.baseurl_http}/get_guild_service_profile")
+        if result["status"] == "ok":
+            return BotGuild.parse_obj(result["data"])
+        return False
+
+    async def getGuildList(self) -> T.Union[list, bool]:
+        '''
+        获取频道列表
+        '''
+        result = await fetch.http_post(f"{self.baseurl_http}/get_guild_list")
+        if result["status"] == "ok":
+            return [Guild.parse_obj(_guild) for _guild in result["data"]]
+        return False
+
+    async def getGuildMetaByGuest(self, guild_id: int) -> T.Union[Guild, bool]:
+        '''
+        通过访客获取频道元数据
+        '''
+        result = await fetch.http_post(f"{self.baseurl_http}/get_guild_meta_by_guest", {
+            "guild_id": guild_id
+        })
+        if result["status"] == "ok":
+            return Guild.parse_obj(result["data"])
+        return False
+
+    async def getGuildChannelList(self, guild_id: int, no_cache: bool = False) -> T.Union[list, bool]:
+        '''
+        获取子频道列表
+        '''
+        result = await fetch.http_post(f"{self.baseurl_http}/get_guild_channel_list", {
+            "guild_id": guild_id,
+            "no_cache": no_cache
+        })
+        if result["status"] == "ok":
+            return [Channel.parse_obj(_channel) for _channel in result["data"]]
+        return False
+
+    async def getGuildMembers(self, guild_id: int) -> T.Union[GuildMembers, bool]:
+        '''
+        获取频道成员列表
+        '''
+        result = await fetch.http_post(f"{self.baseurl_http}/get_guild_members", {
+            "guild_id": guild_id
+        })
+        if result["status"] == "ok":
+            return GuildMembers.parse_obj(result["data"])
+        return False
+
+    async def sendGuildChannelMessage(self, guild_id: int, channel_id: int, message: T.Union[str, list]) -> T.Union[BotMessage, bool]:
+        '''
+        发送信息到子频道
+        '''
+        if isinstance(message, list):
+            _message = ""
+            for chain in message:
+                _message += chain.toString()
+            message = _message
+        result = await fetch.http_post(f"{self.baseurl_http}/send_guild_channel_msg", {
+            "guild_id": guild_id,
+            "channel_id": channel_id,
+            "message": message
+        })
+        if result["status"] == "ok":
+            return BotMessage.parse_obj(result["data"])
         return False

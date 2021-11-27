@@ -2,7 +2,7 @@ import typing as T
 from enum import Enum
 from pydantic import BaseModel
 
-from ..entities import Friend, Member, Anonymous, File, OfflineFile, Device
+from ..entities import Friend, Member, Anonymous, File, OfflineFile, Device, GuildMember, Reaction, Channel
 from ..misc import CQParser
 
 parser = CQParser()
@@ -13,6 +13,7 @@ class AppInitEvent(BaseModel):
 class MessageItemType(Enum):
     FriendMessage = "FriendMessage"
     GroupMessage = "GroupMessage"
+    GuildMessage = "GuildMessage"
     BotMessage = "BotMessage"
     Message = "Message"
 
@@ -50,9 +51,27 @@ class GroupMessage(BaseModel):
         message = parser.parseChain(message)
         super().__init__(message=message, **_)
 
+class GuildMessage(BaseModel):
+    type: MessageItemType = "GuildMessage"
+    self_id: int
+    self_tiny_id: int
+    sub_type: str
+    message_id: str
+    guild_id: int
+    channel_id: int
+    user_id: int
+    message: T.Union[str, list]
+    sender: GuildMember
+    raw_message: T.Optional[str]
+
+    def __init__(self, message: str, **_):
+        raw_message = message
+        message = parser.parseChain(message)
+        super().__init__(message=message, raw_message=raw_message, **_)
+
 class BotMessage(BaseModel):
     type: MessageItemType = "BotMessage"
-    message_id: int
+    message_id: T.Union[int, str]
 
 class Message(BaseModel):  # getMessage
     type: MessageItemType = "Message"
@@ -69,7 +88,8 @@ class Message(BaseModel):  # getMessage
 
 MessageTypes = {
     "private": FriendMessage,
-    "group": GroupMessage
+    "group": GroupMessage,
+    "guild": GuildMessage
 }
 
 class ForwardMessageSender(BaseModel):
@@ -104,6 +124,11 @@ class NoticeItemType(Enum):
     FriendOfflineFile = "FriendOfflineFile"
     ClientStatusChange = "ClientStatusChange"
     EssenceMessageChange = "EssenceMessageChange"
+    # 以下为频道事件
+    MessageReactionsUpdated = "MessageReactionsUpdated"
+    ChannelUpdated = "ChannelUpdated"
+    ChannelCreated = "ChannelCreated"
+    ChannelDestroyed = "ChannelDestroyed"
 
 class GroupFileUpload(BaseModel):
     type: NoticeItemType = "GroupFileUpload"
@@ -205,6 +230,37 @@ class EssenceMessageChange(BaseModel):
     operator_id: int
     message_id: int
 
+class MessageReactionsUpdated(BaseModel):
+    type: NoticeItemType = "MessageReactionsUpdated"
+    guild_id: int
+    channel_id: int
+    user_id: int
+    message_id: str
+    current_reactions: T.List[Reaction]
+
+class ChannelUpdated(BaseModel):
+    type: NoticeItemType = "ChannelUpdated"
+    guild_id: int
+    channel_id: int
+    user_id: int
+    operator_id: int
+    old_info: Channel
+    new_info: Channel
+
+class ChannelCreated(BaseModel):
+    guild_id: int
+    channel_id: int
+    user_id: int
+    operator_id: int
+    channel_info: Channel
+
+class ChannelDestroyed(BaseModel):
+    guild_id: int
+    channel_id: int
+    user_id: int
+    operator_id: int
+    channel_info: Channel
+
 NoticeTypes = {
     "group_upload": GroupFileUpload,
     "group_admin": GroupAdminChange,
@@ -218,7 +274,11 @@ NoticeTypes = {
     "group_card": GroupCardChange,
     "offline_file": FriendOfflineFile,
     "client_status": ClientStatusChange,
-    "essence": EssenceMessageChange
+    "essence": EssenceMessageChange,
+    "message_reactions_updated": MessageReactionsUpdated,
+    "channel_updated": ChannelUpdated,
+    "channel_created": ChannelCreated,
+    "channel_destroyed": ChannelDestroyed
 }
 
 class RequestItemType(Enum):

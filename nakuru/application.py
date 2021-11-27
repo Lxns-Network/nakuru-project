@@ -2,6 +2,7 @@ import aiohttp
 import asyncio
 import inspect
 import copy
+import pydantic
 
 from contextlib import AsyncExitStack
 from typing import Callable, NamedTuple, Awaitable, Any, List, Dict
@@ -9,10 +10,10 @@ from functools import partial
 from async_lru import alru_cache
 
 from .event import InternalEvent, ExternalEvent
-from .event.models import MessageTypes, NoticeTypes, RequestTypes, Friend, Member,  GroupMessageRecall
+from .event.models import MessageTypes, NoticeTypes, RequestTypes, Friend, Member, GuildMember
 from .event.builtins import ExecutorProtocol, Depend
 from .event.models import (
-    FriendMessage, GroupMessage, MessageItemType
+    FriendMessage, GroupMessage, GuildMessage, MessageItemType
 )
 from .event.enums import ExternalEvents
 from .misc import argument_signature, raiser, TRACEBACKED
@@ -55,13 +56,17 @@ class CQHTTP(CQHTTP_Protocol):
                         continue
                     if received_data:
                         post_type = received_data["post_type"]
-                        if post_type == "message":
-                            received_data = MessageTypes[received_data["message_type"]].parse_obj(received_data)
-                        elif post_type == "notice":
-                            received_data = NoticeTypes[received_data["notice_type"]].parse_obj(received_data)
-                        elif post_type == "request":
-                            received_data = RequestTypes[received_data["request_type"]].parse_obj(received_data)
-                        else:
+                        try:
+                            if post_type == "message":
+                                received_data = MessageTypes[received_data["message_type"]].parse_obj(received_data)
+                            elif post_type == "notice":
+                                received_data = NoticeTypes[received_data["notice_type"]].parse_obj(received_data)
+                            elif post_type == "request":
+                                received_data = RequestTypes[received_data["request_type"]].parse_obj(received_data)
+                            else:
+                                continue
+                        except pydantic.error_wrappers.ValidationError:
+                            Event.error("data parse error:", received_data)
                             continue
                         await self.queue.put(InternalEvent(
                             name=self.getEventCurrentName(type(received_data)),
@@ -218,6 +223,7 @@ class CQHTTP(CQHTTP_Protocol):
         class_list = (
             GroupMessage,
             FriendMessage,
+            GuildMessage,
             *self.get_event_class_name()
         )
         if inspect.isclass(event_value) and issubclass(event_value, ExternalEvent):  # subclass
@@ -237,17 +243,23 @@ class CQHTTP(CQHTTP_Protocol):
     def get_annotations_mapping(self):
         return {
             CQHTTP: lambda k: self,
+            FriendMessage: lambda k: k.body \
+                if self.getEventCurrentName(k.body) == "FriendMessage" else \
+                raiser(ValueError("you cannot setting a unbind argument.")),
             GroupMessage: lambda k: k.body \
                 if self.getEventCurrentName(k.body) == "GroupMessage" else \
                 raiser(ValueError("you cannot setting a unbind argument.")),
-            FriendMessage: lambda k: k.body \
-                if self.getEventCurrentName(k.body) == "FriendMessage" else \
+            GuildMessage: lambda k: k.body \
+                if self.getEventCurrentName(k.body) == "GuildMessage" else \
                 raiser(ValueError("you cannot setting a unbind argument.")),
             Friend: lambda k: k.body.sender \
                 if self.getEventCurrentName(k.body) == "FriendMessage" else \
                 raiser(ValueError("Friend is not enable in this type of event.")),
             Member: lambda k: k.body.sender \
                 if self.getEventCurrentName(k.body) == "GroupMessage" else \
+                raiser(ValueError("Group is not enable in this type of event.")),
+            GuildMember: lambda k: k.body.sender \
+                if self.getEventCurrentName(k.body) == "GuildMessage" else \
                 raiser(ValueError("Group is not enable in this type of event.")),
             "Sender": lambda k: k.body.sender \
                 if self.getEventCurrentName(k.body) in MessageTypes else \

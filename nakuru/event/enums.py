@@ -17,6 +17,11 @@ class ExternalEvents(Enum):
     FriendOfflineFile = FriendOfflineFile
     ClientStatusChange = ClientStatusChange
     EssenceMessageChange = EssenceMessageChange
+    
+    MessageReactionsUpdated = MessageReactionsUpdated
+    ChannelUpdated = ChannelUpdated
+    ChannelCreated = ChannelCreated
+    ChannelDestroyed = ChannelDestroyed
 
     FriendRequest = FriendRequest
     GroupRequest = GroupRequest
@@ -37,6 +42,11 @@ class ExternalEventTypes(Enum):
     FriendOfflineFile = "FriendOfflineFile"
     ClientStatusChange = "ClientStatusChange"
     EssenceMessageChange = "EssenceMessageChange"
+
+    MessageReactionsUpdated = "MessageReactionsUpdated"
+    ChannelUpdated = "ChannelUpdated"
+    ChannelCreated = "ChannelCreated"
+    ChannelDestroyed = "ChannelDestroyed"
 
     FriendRequest = "FriendRequest"
     GroupRequest = "GroupRequest"
