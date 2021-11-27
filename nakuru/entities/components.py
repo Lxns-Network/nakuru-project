@@ -26,7 +26,6 @@ class ComponentType(Enum):
     Reply = "Reply"
     RedBag = "RedBag"
     Poke = "Poke"
-    Gift = "Gift"
     Forward = "Forward"
     Node = "Node"
     Xml = "Xml"
@@ -313,15 +312,6 @@ class Poke(BaseMessageComponent):
         super().__init__(**_)
 
 
-class Gift(BaseMessageComponent):
-    type: ComponentType = "Gift"
-    qq: int
-    id: int
-
-    def __init__(self, **_):
-        super().__init__(**_)
-
-
 class Forward(BaseMessageComponent):
     type: ComponentType = "Forward"
     id: str
@@ -425,7 +415,6 @@ ComponentTypes = {
     "reply": Reply,
     "redbag": RedBag,
     "poke": Poke,
-    "gift": Gift,
     "forward": Forward,
     "node": Node,
     "xml": Xml,
