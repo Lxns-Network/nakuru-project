@@ -636,3 +636,81 @@ class CQHTTP_Protocol:
         if result["status"] == "ok":
             return BotMessage.parse_obj(result["data"])
         return False
+
+    async def getGuildRoles(self, guild_id: int) -> T.Union[Role, bool]:
+        '''
+        获取频道身份组列表
+        '''
+        result = await fetch.http_post(f"{self.baseurl_http}/get_guild_roles", {
+            "guild_id": guild_id
+        })
+        if result["status"] == "ok":
+            return [Role.parse_obj(_role) for _role in result["data"]]
+        return False
+
+    async def createGuildRole(self, guild_id: int, name: str, color: int, independent: bool, initial_users: T.List[int] = []) -> T.Union[Role, bool]:
+        '''
+        创建频道身份组
+        '''
+        result = await fetch.http_post(f"{self.baseurl_http}/create_guild_role", {
+            "guild_id": guild_id,
+            "name": name,
+            "color": color,
+            "independent": independent,
+            "initial_users": initial_users
+        })
+        if result["status"] == "ok":
+            return Role.parse_obj(result["data"])
+        return False
+
+    async def deleteGuildRole(self, guild_id: int, role_id: int) -> bool:
+        '''
+        删除频道身份组
+        '''
+        result = await fetch.http_post(f"{self.baseurl_http}/delete_guild_role", {
+            "guild_id": guild_id,
+            "role_id": role_id
+        })
+        if result["status"] == "ok":
+            return True
+        return False
+
+    async def setGuildMemberRole(self, guild_id: int, role_id: int, users: T.List[int]) -> bool:
+        '''
+        设置用户在频道中的身份组
+        '''
+        result = await fetch.http_post(f"{self.baseurl_http}/set_guild_member_role", {
+            "guild_id": guild_id,
+            "role_id": role_id,
+            "users": users
+        })
+        if result["status"] == "ok":
+            return True
+        return False
+
+    async def editGuildRole(self, guild_id: int, role_id: int, name: str, color: int, independent: bool) -> bool:
+        '''
+        设置用户在频道中的身份组
+        '''
+        result = await fetch.http_post(f"{self.baseurl_http}/update_guild_role", {
+            "guild_id": guild_id,
+            "role_id": role_id,
+            "name": name,
+            "color": color,
+            "independent": independent # TODO gocq 中参数名写错了，待后续确认
+        })
+        if result["status"] == "ok":
+            return True
+        return False
+
+    async def getTopicChannelFeeds(self, guild_id: int, channel_id: int) -> T.Union[T.List[TopicChannelFeed], bool]:
+        '''
+        获取论坛子频道帖子列表
+        '''
+        result = await fetch.http_post(f"{self.baseurl_http}/get_topic_channel_feeds", {
+            "guild_id": guild_id,
+            "channel_id": channel_id
+        })
+        if result["status"] == "ok":
+            return [TopicChannelFeed.parse_obj(_feed) for _feed in result["data"]]
+        return False

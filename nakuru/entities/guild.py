@@ -45,6 +45,8 @@ class GuildMember(BaseModel):
     title: Optional[str]
     nickname: str
     role: Optional[int]
+    # 仅论坛子频道
+    icon_url: Optional[str]
 
 class GuildMembers(BaseModel):
     members: List[GuildMember]
@@ -58,3 +60,39 @@ class Reaction(BaseModel):
     emoji_name: str
     count: int
     clicked: bool
+
+class Role(BaseModel):
+    role_id: int
+    role_name: Optional[str]
+    argb_color: Optional[int]
+    independent: Optional[bool]
+    member_count: Optional[int]
+    max_count: Optional[int]
+    owned: Optional[int]
+    disabled: Optional[bool]
+
+"""
+论坛子频道相关
+"""
+
+class TopicChannelFile(BaseModel):
+    file_id: str
+    pattern_id: str
+    url: str
+    width: int
+    height: int
+
+class TopicChannelFeedResource(BaseModel):
+    images: List[TopicChannelFile]
+    videos: List[TopicChannelFile]
+
+class TopicChannelFeed(BaseModel):
+    id: int
+    title: str
+    sub_title: str
+    create_time: int
+    guild_id: int
+    channel_id: int
+    poster_info: GuildMember
+    contents: list # TODO 解析论坛子频道 contents，参考 https://github.com/Mrs4s/go-cqhttp/blob/7278f99ed9118fe2e54aca752e62574d5bae3f00/coolq/feed.go#L10
+    resources: TopicChannelFeedResource
