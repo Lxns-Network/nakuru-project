@@ -37,17 +37,20 @@ class CQHTTP(CQHTTP_Protocol):
                  host: str = None,
                  port: int = None,
                  http_port: int = None,
+                 token: str = '',
                  global_dependencies: List[Depend] = None,
                  global_middlewares: List = None):
         self.global_dependencies = global_dependencies or []
         self.global_middlewares = global_middlewares or []
+        self.token = token
 
         self.baseurl = f"http://{host}:{port}"
         self.baseurl_http = f"http://{host}:{http_port}"
 
     async def ws_event(self):
         async with aiohttp.ClientSession() as session:
-            async with session.ws_connect(f"{self.baseurl}") as ws_connection:
+            headers = {'Authorization':f"Bearer {self.token}"}
+            async with session.ws_connect(f"{self.baseurl}",headers=headers) as ws_connection:
                 Protocol.info(f"connected")
                 while True:
                     try:
