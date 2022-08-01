@@ -11,20 +11,22 @@ class CQHTTP_Protocol:
 
     async def sendFriendMessage(self,
                                 user_id: int,
-                                group_id: int,
                                 message: T.Union[str, list],
+                                group_id: T.Optional[int] = None,
                                 auto_escape: bool = False) -> T.Union[BotMessage, bool]:
         if isinstance(message, list):
             _message = ""
             for chain in message:
                 _message += chain.toString()
             message = _message
-        result = await fetch.http_post(f"{self.baseurl_http}/send_private_msg", {
+        payload = {
             "user_id": user_id,
-            "group_id": group_id,
             "message": message,
             "auto_escape": auto_escape
-        })
+        }
+        if group_id:
+            payload["group_id"] = group_id
+        result = await fetch.http_post(f"{self.baseurl_http}/send_private_msg", payload)
         if result["status"] == "ok":
             return BotMessage.parse_obj(result["data"])
         return False

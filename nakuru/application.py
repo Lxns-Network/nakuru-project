@@ -1,3 +1,4 @@
+import sys
 import aiohttp
 import asyncio
 import inspect
@@ -174,7 +175,7 @@ class CQHTTP(CQHTTP_Protocol):
     
     def run(self):
         loop = asyncio.get_event_loop()
-        self.queue = asyncio.Queue(loop=loop)
+        self.queue = asyncio.Queue(loop=loop) if sys.version_info.minor < 10 else asyncio.Queue()
         loop.create_task(self.ws_event())
         loop.create_task(self.event_runner())
 
