@@ -49,7 +49,7 @@ class CQHTTP(CQHTTP_Protocol):
     async def ws_event(self):
         async with aiohttp.ClientSession() as session:
             async with session.ws_connect(f"{self.baseurl}") as ws_connection:
-                logger.info("Protocol: ", "connected")
+                logger.info("Protocol: connected")
                 while True:
                     try:
                         received_data = await ws_connection.receive_json()
@@ -67,10 +67,10 @@ class CQHTTP(CQHTTP_Protocol):
                             else:
                                 continue
                         except KeyError:
-                            logger.error("Protocol: ", "data parse error:", received_data)
+                            logger.error("Protocol: data parse error:", received_data)
                             continue
                         except pydantic.error_wrappers.ValidationError:
-                            logger.error("Protocol: ", "data parse error:", received_data)
+                            logger.error("Protocol: data parse error:", received_data)
                             continue
                         await self.queue.put(InternalEvent(
                             name=self.getEventCurrentName(type(received_data)),
@@ -85,7 +85,7 @@ class CQHTTP(CQHTTP_Protocol):
                 continue
 
             if event_context.name in self.registeredEventNames:
-                logger.info("Event: ", f"handling a event: {event_context.name}")
+                logger.info(f"Event: handling a event: {event_context.name}")
                 for event_body in list(self.event.values()) \
                         [self.registeredEventNames.index(event_context.name)]:
                     if event_body:

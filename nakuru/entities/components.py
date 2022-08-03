@@ -106,7 +106,7 @@ class Record(BaseMessageComponent):
     def __init__(self, file: T.Optional[str], **_):
         for k in _.keys():
             if k == "url":
-                logger.warn("Protocol: ", "you should put url into file parameter")
+                logger.warn("Protocol: you should put url into file parameter")
                 # Protocol.warn(f"go-cqhttp doesn't support send {self.type} by {k}")
         super().__init__(file=file, **_)
 
@@ -132,7 +132,7 @@ class Video(BaseMessageComponent):
     def __init__(self, file: str, **_):
         for k in _.keys():
             if k == "c" and _[k] not in [2, 3]:
-                logger.warn("Protocol: ", f"{k}={_[k]} doesn't match values")
+                logger.warn(f"Protocol: {k}={_[k]} doesn't match values")
         super().__init__(file=file, **_)
 
     @staticmethod
@@ -210,7 +210,7 @@ class Contact(BaseMessageComponent):  # TODO
     def __init__(self, **_):
         for k in _.keys():
             if k == "_type" and _[k] not in ["qq", "group"]:
-                logger.warn("Protocol: ", f"{k}={_[k]} doesn't match values")
+                logger.warn(f"Protocol: {k}={_[k]} doesn't match values")
         super().__init__(**_)
 
 
@@ -238,7 +238,7 @@ class Music(BaseMessageComponent):
     def __init__(self, **_):
         for k in _.keys():
             if k == "_type" and _[k] not in ["qq", "163", "xm", "custom"]:
-                logger.warn("Protocol: ", f"{k}={_[k]} doesn't match values")
+                logger.warn(f"Protocol: {k}={_[k]} doesn't match values")
         super().__init__(**_)
 
 
@@ -258,7 +258,7 @@ class Image(BaseMessageComponent):
         for k in _.keys():
             if (k == "_type" and _[k] not in ["flash", "show", None]) or \
                     (k == "c" and _[k] not in [2, 3]):
-                logger.warn("Protocol: ", f"{k}={_[k]} doesn't match values")
+                logger.warn(f"Protocol: {k}={_[k]} doesn't match values")
         super().__init__(file=file, **_)
 
     @staticmethod
@@ -338,7 +338,7 @@ class Node(BaseMessageComponent):  # 该 component 仅支持使用 sendGroupForw
         super().__init__(content=content, **_)
 
     def toString(self):
-        logger.warn("Protocol: ", "node doesn't support stringify")
+        logger.warn("Protocol: node doesn't support stringify")
         return ""
 
 

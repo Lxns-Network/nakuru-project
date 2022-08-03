@@ -16,10 +16,10 @@ def protocol_log(func):
     async def wrapper(*args, **kwargs):
         try:
             result = await func(*args, **kwargs)
-            logger.info("Protocol: ", f"protocol method {func.__name__} was called")
+            logger.info(f"Protocol: protocol method {func.__name__} was called")
             return result
         except Exception as e:
-            logger.error("Protocol: ", f"protocol method {func.__name__} raised a error: {e.__class__.__name__}")
+            logger.error(f"Protocol: protocol method {func.__name__} raised a error: {e.__class__.__name__}")
             raise e
 
     return wrapper
