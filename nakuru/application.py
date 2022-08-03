@@ -4,6 +4,7 @@ import asyncio
 import inspect
 import copy
 import pydantic
+import traceback
 
 from contextlib import AsyncExitStack
 from typing import Callable, NamedTuple, Awaitable, Any, List, Dict
@@ -19,8 +20,7 @@ from .event.models import (
 from .event.enums import ExternalEvents
 from .misc import argument_signature, raiser, TRACEBACKED
 from .protocol import CQHTTP_Protocol
-from .logger import Event, Protocol
-from .logger import Session as SessionLogger
+from .logger import logger
 
 class CQHTTP(CQHTTP_Protocol):
     event: Dict[
@@ -49,7 +49,7 @@ class CQHTTP(CQHTTP_Protocol):
     async def ws_event(self):
         async with aiohttp.ClientSession() as session:
             async with session.ws_connect(f"{self.baseurl}") as ws_connection:
-                Protocol.info(f"connected")
+                logger.info("Protocol: ", "connected")
                 while True:
                     try:
                         received_data = await ws_connection.receive_json()
@@ -66,8 +66,11 @@ class CQHTTP(CQHTTP_Protocol):
                                 received_data = RequestTypes[received_data["request_type"]].parse_obj(received_data)
                             else:
                                 continue
+                        except KeyError:
+                            logger.error("Protocol: ", "data parse error:", received_data)
+                            continue
                         except pydantic.error_wrappers.ValidationError:
-                            Event.error("data parse error:", received_data)
+                            logger.error("Protocol: ", "data parse error:", received_data)
                             continue
                         await self.queue.put(InternalEvent(
                             name=self.getEventCurrentName(type(received_data)),
@@ -82,7 +85,7 @@ class CQHTTP(CQHTTP_Protocol):
                 continue
 
             if event_context.name in self.registeredEventNames:
-                Event.info(f"handling a event: {event_context.name}")
+                logger.info("Event: ", f"handling a event: {event_context.name}")
                 for event_body in list(self.event.values()) \
                         [self.registeredEventNames.index(event_context.name)]:
                     if event_body:
@@ -173,34 +176,37 @@ class CQHTTP(CQHTTP_Protocol):
 
             return await self.run_func(executor_protocol.callable, **CallParams, **extra_parameter)
     
-    def run(self):
+    async def _run(self):
         loop = asyncio.get_event_loop()
         self.queue = asyncio.Queue(loop=loop) if sys.version_info.minor < 10 else asyncio.Queue()
         loop.create_task(self.ws_event())
         loop.create_task(self.event_runner())
 
-        loop.run_until_complete(self.queue.put(InternalEvent(
+        await self.queue.put(InternalEvent(
             name=self.getEventCurrentName("AppInitEvent"),
             body={}
-        )))
+        ))
         try:
             for start_callable in self.lifecycle['start']:
-                loop.run_until_complete(self.run_func(start_callable, self))
+                await self.run_func(start_callable, self)
 
             for around_callable in self.lifecycle['around']:
-                loop.run_until_complete(self.run_func(around_callable, self))
+                await self.run_func(around_callable, self)
 
-            loop.run_forever()
         except KeyboardInterrupt:
-            SessionLogger.info("catched Ctrl-C, exiting..")
+            logger.info("catched Ctrl-C, exiting..")
         except Exception as e:
             traceback.print_exc()
         finally:
             for around_callable in self.lifecycle['around']:
-                loop.run_until_complete(self.run_func(around_callable, self))
+                await self.run_func(around_callable, self)
 
             for end_callable in self.lifecycle['end']:
-                loop.run_until_complete(self.run_func(end_callable, self))
+                await self.run_func(end_callable, self)
+    
+    def run(self):
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self._run())
 
     def receiver(self,
                  event_name,

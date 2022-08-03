@@ -3,7 +3,7 @@ import os
 import typing as T
 from collections import namedtuple
 
-from .logger import Protocol
+from .logger import logger
 
 Parameter = namedtuple("Parameter", ["name", "annotation", "default"])
 
@@ -16,10 +16,10 @@ def protocol_log(func):
     async def wrapper(*args, **kwargs):
         try:
             result = await func(*args, **kwargs)
-            Protocol.info(f"protocol method {func.__name__} was called")
+            logger.info("Protocol: ", f"protocol method {func.__name__} was called")
             return result
         except Exception as e:
-            Protocol.error(f"protocol method {func.__name__} raised a error: {e.__class__.__name__}")
+            logger.error("Protocol: ", f"protocol method {func.__name__} raised a error: {e.__class__.__name__}")
             raise e
 
     return wrapper
