@@ -129,6 +129,7 @@ class NoticeItemType(Enum):
     ChannelUpdated = "ChannelUpdated"
     ChannelCreated = "ChannelCreated"
     ChannelDestroyed = "ChannelDestroyed"
+    GuildChannelRecall = "GuildChannelRecall"
 
 class GroupFileUpload(BaseModel):
     type: NoticeItemType = "GroupFileUpload"
@@ -261,6 +262,14 @@ class ChannelDestroyed(BaseModel):
     operator_id: int
     channel_info: Channel
 
+class GuildChannelRecall(BaseModel):
+    guild_id: int
+    channel_id: int
+    operator_id: int
+    message_id: int
+    self_tiny_id: int
+    user_id: int
+
 NoticeTypes = {
     "group_upload": GroupFileUpload,
     "group_admin": GroupAdminChange,
@@ -278,7 +287,8 @@ NoticeTypes = {
     "message_reactions_updated": MessageReactionsUpdated,
     "channel_updated": ChannelUpdated,
     "channel_created": ChannelCreated,
-    "channel_destroyed": ChannelDestroyed
+    "channel_destroyed": ChannelDestroyed,
+    "guild_channel_recall": GuildChannelRecall
 }
 
 class RequestItemType(Enum):
