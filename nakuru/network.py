@@ -8,9 +8,9 @@ import aiohttp
 
 class fetch:
     @staticmethod
-    async def http_post(url, data_map=None):
+    async def http_post(url, data_map=None, **kwargs):
         async with aiohttp.ClientSession() as session:
-            async with session.post(url, json=data_map) as response:
+            async with session.post(url, json=data_map, **kwargs) as response:
                 data = await response.text(encoding="utf-8")
                 logger.debug(f"Network: requested url={url}, by data_map={data_map}, and status={response.status}, data={data}")
                 response.raise_for_status()
@@ -20,9 +20,9 @@ class fetch:
             logger.error(f"Network: requested {url} with {data_map}, responsed {data}, decode failed...")
 
     @staticmethod
-    async def http_get(url, params=None): 
+    async def http_get(url, params=None, **kwargs): 
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, params=params) as response:
+            async with session.get(url, params=params, **kwargs) as response:
                 response.raise_for_status()
                 data = await response.text(encoding="utf-8")
                 logger.debug(f"Network: requested url={url}, by params={params}, and status={response.status}, data={data}")

@@ -30,7 +30,8 @@ from nakuru.entities.components import Plain, Image
 app = CQHTTP(
     host="127.0.0.1",
     port=6700,
-    http_port=5700
+    http_port=5700,
+    token="TOKEN" # 可选，如果配置了 Access-Token
 )
 
 @app.receiver("GroupMessage")

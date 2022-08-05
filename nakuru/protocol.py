@@ -8,6 +8,7 @@ from .network import fetch
 
 class CQHTTP_Protocol:
     baseurl_http: str
+    protocol_params: str
 
     async def sendFriendMessage(self,
                                 user_id: int,
@@ -26,7 +27,7 @@ class CQHTTP_Protocol:
         }
         if group_id:
             payload["group_id"] = group_id
-        result = await fetch.http_post(f"{self.baseurl_http}/send_private_msg", payload)
+        result = await fetch.http_post(f"{self.baseurl_http}/send_private_msg", payload, params=self.protocol_params)
         if result["status"] == "ok":
             return BotMessage.parse_obj(result["data"])
         return False
@@ -44,7 +45,7 @@ class CQHTTP_Protocol:
             "group_id": group_id,
             "message": message,
             "auto_escape": auto_escape
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return BotMessage.parse_obj(result["data"])
         return False
@@ -58,7 +59,7 @@ class CQHTTP_Protocol:
         result = await fetch.http_post(f"{self.baseurl_http}/send_group_forward_msg", {
             "group_id": group_id,
             "messages": messages
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return BotMessage.parse_obj(result["data"])
         return False
@@ -66,7 +67,7 @@ class CQHTTP_Protocol:
     async def recall(self, message_id: int) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/delete_msg", {
             "message_id": message_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -74,7 +75,7 @@ class CQHTTP_Protocol:
     async def getMessage(self, message_id: int) -> T.Union[Message, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_msg", {
             "message_id": message_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return Message.parse_obj(result["data"])
         return False
@@ -82,7 +83,7 @@ class CQHTTP_Protocol:
     async def getForwardMessage(self, message_id: int) -> T.Union[ForwardMessages, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_forward_msg", {
             "message_id": message_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return ForwardMessages.parse_obj(result["data"])
         return False
@@ -90,7 +91,7 @@ class CQHTTP_Protocol:
     async def getImage(self, file: str) -> T.Union[ImageFile, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_image", {
             "file": file
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return ImageFile.parse_obj(result["data"])
         return False
@@ -103,7 +104,7 @@ class CQHTTP_Protocol:
             "group_id": group_id,
             "user_id": user_id,
             "reject_add_request": reject_add_request
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -116,7 +117,7 @@ class CQHTTP_Protocol:
             "group_id": group_id,
             "user_id": user_id,
             "duration": duration
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -133,7 +134,7 @@ class CQHTTP_Protocol:
             "group_id": group_id,
             "flag": flag,
             "duration": duration
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -144,7 +145,7 @@ class CQHTTP_Protocol:
         result = await fetch.http_post(f"{self.baseurl_http}/set_group_whole_ban", {
             "group_id": group_id,
             "enable": enable
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -157,7 +158,7 @@ class CQHTTP_Protocol:
             "group_id": group_id,
             "user_id": user_id,
             "enable": enable
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -168,7 +169,7 @@ class CQHTTP_Protocol:
         result = await fetch.http_post(f"{self.baseurl_http}/set_group_anonymous", {
             "group_id": group_id,
             "enable": enable
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -181,7 +182,7 @@ class CQHTTP_Protocol:
             "group_id": group_id,
             "user_id": user_id,
             "card": card
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -192,7 +193,7 @@ class CQHTTP_Protocol:
         result = await fetch.http_post(f"{self.baseurl_http}/set_group_name", {
             "group_id": group_id,
             "group_name": group_name
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -203,7 +204,7 @@ class CQHTTP_Protocol:
         result = await fetch.http_post(f"{self.baseurl_http}/set_group_leave", {
             "group_id": group_id,
             "is_dismiss": is_dismiss
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -218,7 +219,7 @@ class CQHTTP_Protocol:
             "user_id": user_id,
             "special_title": special_title,
             "duration": duration
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -231,7 +232,7 @@ class CQHTTP_Protocol:
             "flag": flag,
             "approve": approve,
             "remark": remark
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -248,7 +249,7 @@ class CQHTTP_Protocol:
             "sub_type": sub_type,
             "approve": approve,
             "reason": reason
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -271,7 +272,7 @@ class CQHTTP_Protocol:
         result = await fetch.http_post(f"{self.baseurl_http}/get_stranger_info", {
             "user_id": user_id,
             "no_cache": no_cache
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return Stranger.parse_obj(result["data"])
         return False
@@ -286,7 +287,7 @@ class CQHTTP_Protocol:
                            friend_id: int) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/delete_friend", {
             "friend_id": friend_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -301,7 +302,7 @@ class CQHTTP_Protocol:
                                          user_id: int) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/delete_unidirectional_friend", {
             "user_id": user_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -312,7 +313,7 @@ class CQHTTP_Protocol:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_info", {
             "group_id": group_id,
             "no_cache": no_cache
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return Group.parse_obj(result["data"])
         return False
@@ -331,7 +332,7 @@ class CQHTTP_Protocol:
             "group_id": group_id,
             "user_id": user_id,
             "no_cache": no_cache
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return Member.parse_obj(result["data"])
         return False
@@ -340,7 +341,7 @@ class CQHTTP_Protocol:
                                  group_id: int) -> T.Union[List[Member], bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_member_list", {
             "group_id": group_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return [Member.parse_obj(member_info) for member_info in result["data"]]
         return False
@@ -351,7 +352,7 @@ class CQHTTP_Protocol:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_honor_info", {
             "group_id": group_id,
             "type": type
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return Honor.parse_obj(result["data"])
         return False
@@ -379,7 +380,7 @@ class CQHTTP_Protocol:
     async def restartAPI(self, delay: int = 0) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/set_restart", {
             "delay": delay
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -392,7 +393,7 @@ class CQHTTP_Protocol:
             "group_id": group_id,
             "file": file,
             "cache": cache
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -401,7 +402,7 @@ class CQHTTP_Protocol:
                        image: str) -> T.Union[OCR, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/ocr_image", {
             "image": image
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return OCR.parse_obj(result["data"])
         return False
@@ -415,7 +416,7 @@ class CQHTTP_Protocol:
     async def uploadGroupFile(self, group_id: int) -> T.Union[GroupFileSystem, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_file_system_info", {
             "group_id": group_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return GroupFileSystem.parse_obj(result["data"])
         return False
@@ -423,7 +424,7 @@ class CQHTTP_Protocol:
     async def getGroupRootFiles(self, group_id: int) -> T.Union[GroupFileTree, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_root_files", {
             "group_id": group_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return GroupFileTree.parse_obj(result["data"])
         return False
@@ -434,7 +435,7 @@ class CQHTTP_Protocol:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_root_files", {
             "group_id": group_id,
             "folder_id": folder_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return GroupFileTree.parse_obj(result["data"])
         return False
@@ -447,7 +448,7 @@ class CQHTTP_Protocol:
             "group_id": group_id,
             "file_id": file_id,
             "busid": busid
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return result["data"]["url"]
         return False
@@ -461,7 +462,7 @@ class CQHTTP_Protocol:
     async def getGroupAtAllRemain(self, group_id: int) -> T.Union[AtAllRemain, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_at_all_remain", {
             "group_id": group_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return AtAllRemain.parse_obj(result["data"])
         return False
@@ -469,7 +470,7 @@ class CQHTTP_Protocol:
     async def getVipInfo(self, user_id: int) -> T.Union[VipInfo, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/_get_vip_info", {
             "user_id": user_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return VipInfo.parse_obj(result["data"])
         return False
@@ -478,7 +479,7 @@ class CQHTTP_Protocol:
         result = await fetch.http_post(f"{self.baseurl_http}/_send_group_notice", {
             "group_id": group_id,
             "content": content
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -486,7 +487,7 @@ class CQHTTP_Protocol:
     async def reloadEventFilter(self, file: str):
         result = await fetch.http_post(f"{self.baseurl_http}/reload_event_filter", {
             "file": file
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -496,7 +497,7 @@ class CQHTTP_Protocol:
             "url": url,
             "headers": headers,
             "thread_count": thread_count
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -504,17 +505,16 @@ class CQHTTP_Protocol:
     async def getOnlineClients(self, no_cashe: bool) -> T.Union[List[Device], bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_online_clients", {
             "no_cache": no_cashe
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return [Device.parse_obj(device) for device in result["data"]["clients"]]
         return False
 
-    async def getGroupMessageHistory(self, group_id: int, message_seq: Optional[int] = None) -> T.Union[List[Message],
-                                                                                                        bool]:
+    async def getGroupMessageHistory(self, group_id: int, message_seq: Optional[int] = None) -> T.Union[List[Message], bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_msg_history", {
             "message_seq": message_seq,
             "group_id": group_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             print(result)
             return [Message.parse_obj(message) for message in result["data"]["messages"]]
@@ -523,7 +523,7 @@ class CQHTTP_Protocol:
     async def setEssenceMessage(self, message_id: int) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/set_essence_msg", {
             "message_id": message_id
-        })  # 草,为什么只有手机看得到
+        }, params=self.protocol_params)  # 草,为什么只有手机看得到
         if result["status"] == "ok":
             return True
         return False
@@ -531,7 +531,7 @@ class CQHTTP_Protocol:
     async def deleteEssenceMessage(self, message_id: int) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/delete_essence_msg", {
             "message_id": message_id
-        })  # 这个我没测试过
+        }, params=self.protocol_params)  # 这个我没测试过
         if result["status"] == "ok":
             return True
         return False
@@ -539,7 +539,7 @@ class CQHTTP_Protocol:
     async def getEssenceMessageList(self, group_id: int) -> T.Union[EssenceMessage, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_essence_msg_list", {
             "group_id": group_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return EssenceMessage.parse_obj(result["data"])
         return False
@@ -547,7 +547,7 @@ class CQHTTP_Protocol:
     async def checkURLSafety(self, url: str) -> int:
         result = await fetch.http_post(f"{self.baseurl_http}/check_url_safely", {
             "url": url
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return result["level"]
         return False
@@ -555,7 +555,7 @@ class CQHTTP_Protocol:
     async def getModelShow(self, model: str) -> T.Union[List[ModelShow], bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/_get_model_show", {
             "model": model
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return [ModelShow.parse_obj(_model) for _model in result["data"]["variants"]]
         return False
@@ -564,7 +564,7 @@ class CQHTTP_Protocol:
         result = await fetch.http_post(f"{self.baseurl_http}/_set_model_show", {
             "model": model,
             "model_show": model_show
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -593,7 +593,7 @@ class CQHTTP_Protocol:
         '''
         result = await fetch.http_post(f"{self.baseurl_http}/get_guild_meta_by_guest", {
             "guild_id": guild_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return Guild.parse_obj(result["data"])
         return False
@@ -605,7 +605,7 @@ class CQHTTP_Protocol:
         result = await fetch.http_post(f"{self.baseurl_http}/get_guild_channel_list", {
             "guild_id": guild_id,
             "no_cache": no_cache
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return [Channel.parse_obj(_channel) for _channel in result["data"]]
         return False
@@ -616,7 +616,7 @@ class CQHTTP_Protocol:
         '''
         result = await fetch.http_post(f"{self.baseurl_http}/get_guild_members", {
             "guild_id": guild_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return GuildMembers.parse_obj(result["data"])
         return False
@@ -634,7 +634,7 @@ class CQHTTP_Protocol:
             "guild_id": guild_id,
             "channel_id": channel_id,
             "message": message
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return BotMessage.parse_obj(result["data"])
         return False
@@ -645,7 +645,7 @@ class CQHTTP_Protocol:
         '''
         result = await fetch.http_post(f"{self.baseurl_http}/get_guild_roles", {
             "guild_id": guild_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return [Role.parse_obj(_role) for _role in result["data"]]
         return False
@@ -660,7 +660,7 @@ class CQHTTP_Protocol:
             "color": color,
             "independent": independent,
             "initial_users": initial_users
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return Role.parse_obj(result["data"])
         return False
@@ -672,7 +672,7 @@ class CQHTTP_Protocol:
         result = await fetch.http_post(f"{self.baseurl_http}/delete_guild_role", {
             "guild_id": guild_id,
             "role_id": role_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -685,7 +685,7 @@ class CQHTTP_Protocol:
             "guild_id": guild_id,
             "role_id": role_id,
             "users": users
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -700,7 +700,7 @@ class CQHTTP_Protocol:
             "name": name,
             "color": color,
             "independent": independent # TODO gocq 中参数名写错了，待后续确认
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return True
         return False
@@ -712,7 +712,7 @@ class CQHTTP_Protocol:
         result = await fetch.http_post(f"{self.baseurl_http}/get_topic_channel_feeds", {
             "guild_id": guild_id,
             "channel_id": channel_id
-        })
+        }, params=self.protocol_params)
         if result["status"] == "ok":
             return [TopicChannelFeed.parse_obj(_feed) for _feed in result["data"]]
         return False
