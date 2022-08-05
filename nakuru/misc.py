@@ -110,5 +110,5 @@ class CQParser:
                 chain.append(ComponentTypes[message_type].parse_obj(self.getAttributeList(x[1])))
             except:
                 chain.append(ComponentTypes["unknown"].parse_obj({"text": message_type}))
-                logger.error(f"Cannot convert message type: {message_type}")
+                logger.error(f"Protocol: Cannot convert message type: {message_type}")
         return chain
