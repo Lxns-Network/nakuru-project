@@ -8,7 +8,7 @@ from .network import fetch
 
 class CQHTTP_Protocol:
     baseurl_http: str
-    protocol_params: str
+    protocol_params: dict = {}
 
     async def sendFriendMessage(self,
                                 user_id: int,
