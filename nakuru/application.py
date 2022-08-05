@@ -67,10 +67,10 @@ class CQHTTP(CQHTTP_Protocol):
                             else:
                                 continue
                         except KeyError:
-                            logger.error("Protocol: data parse error:", received_data)
+                            logger.error("Protocol: data parse error: " + received_data)
                             continue
                         except pydantic.error_wrappers.ValidationError:
-                            logger.error("Protocol: data parse error:", received_data)
+                            logger.error("Protocol: data parse error: " + received_data)
                             continue
                         await self.queue.put(InternalEvent(
                             name=self.getEventCurrentName(type(received_data)),

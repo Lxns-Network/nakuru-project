@@ -22,6 +22,7 @@ class ExternalEvents(Enum):
     ChannelUpdated = ChannelUpdated
     ChannelCreated = ChannelCreated
     ChannelDestroyed = ChannelDestroyed
+    GuildChannelRecall = GuildChannelRecall
 
     FriendRequest = FriendRequest
     GroupRequest = GroupRequest
@@ -47,6 +48,7 @@ class ExternalEventTypes(Enum):
     ChannelUpdated = "ChannelUpdated"
     ChannelCreated = "ChannelCreated"
     ChannelDestroyed = "ChannelDestroyed"
+    GuildChannelRecall = "GuildChannelRecall"
 
     FriendRequest = "FriendRequest"
     GroupRequest = "GroupRequest"
