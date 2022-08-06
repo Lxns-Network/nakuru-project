@@ -266,7 +266,7 @@ class GuildChannelRecall(BaseModel):
     guild_id: int
     channel_id: int
     operator_id: int
-    message_id: int
+    message_id: str
     user_id: int
 
 NoticeTypes = {
