@@ -214,6 +214,7 @@ class CQHTTP(CQHTTP_Protocol):
     def run(self):
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self._run())
+        loop.run_forever()
 
     def receiver(self,
                  event_name,
