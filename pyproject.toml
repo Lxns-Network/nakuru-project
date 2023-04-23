@@ -4,9 +4,9 @@ build-backend = "hatchling.build"
 
 [project]
 name = "nakuru-project"
-version = "0.0.1"
+version = "1.0.0"
 authors = [
-  { name="JoinChang", email="35451392+JoinChang@users.noreply.github.com" },
+  { name="Lxns-Network", email="joinchang1206@gmail.com" },
 ]
 description = "一款为 go-cqhttp 的正向 WebSocket 设计的 Python SDK，支持纯 CQ 码与消息链的转换处理"
 readme = "README.md"
