@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "nakuru-project-idk"
-version = "1.0.0"
+version = "0.0.1"
 authors = [
   { name="Lxns-Network", email="joinchang1206@gmail.com" },
 ]
