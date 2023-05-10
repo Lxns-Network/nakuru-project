@@ -270,7 +270,7 @@ class CQHTTP_Protocol:
         return False
 
     async def getLoginInfo(self) -> T.Union[Bot, bool]:
-        result = await fetch.http_post(f"{self.baseurl_http}/get_login_info")
+        result = await fetch.http_post(f"{self.baseurl_http}/get_login_info", params=self.protocol_params)
         if result["status"] == "ok":
             return Bot.parse_obj(result["data"])
         return False
