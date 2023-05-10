@@ -63,6 +63,21 @@ class CQHTTP_Protocol:
         if result["status"] == "ok":
             return BotMessage.parse_obj(result["data"])
         return False
+    
+    async def sendPrivateForwardMessage(self,
+                                        user_id: int,
+                                        messages: list) -> T.Union[BotMessage, bool]:
+        for i in range(len(messages)):
+            if isinstance(messages[i], Node):
+                messages[i] = messages[i].toDict()
+
+        result = await fetch.http_post(f"{self.baseurl_http}/send_private_forward_msg", {
+            "user_id": user_id,
+            "messages": messages
+        }, params=self.protocol_params)
+        if result["status"] == "ok":
+            return BotMessage.parse_obj(result["data"])
+        return False
 
     async def recall(self, message_id: int) -> bool:
         result = await fetch.http_post(f"{self.baseurl_http}/delete_msg", {
