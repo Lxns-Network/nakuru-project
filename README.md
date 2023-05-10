@@ -10,7 +10,7 @@
 </div>
 
 ## 食用方法
-使用 `pip install git+https://github.com/Lxns-Network/nakuru-project.git` 安装。
+使用 `pip install nakuru-project` 安装。
 
 需要将 go-cqhttp 的正向 WebSocket 与 HTTP 配置项开启。
 
