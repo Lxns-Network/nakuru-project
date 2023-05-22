@@ -53,11 +53,18 @@ class CQHTTP(CQHTTP_Protocol):
         self.baseurl = f"http://{host}:{port}"
         self.baseurl_http = f"http://{host}:{http_port}"
 
+        self.closed = False
+
+    def close(self):
+        self.closed = True
+
     async def ws_event(self):
         async with aiohttp.ClientSession() as session:
             async with session.ws_connect(f"{self.baseurl}", headers=self.headers) as ws_connection:
                 logger.info("Protocol: connected")
                 while True:
+                    if self.closed:
+                        break
                     try:
                         received_data = await ws_connection.receive_json()
                     except TypeError:
