@@ -428,7 +428,17 @@ class CQHTTP_Protocol:
             return GroupSystemMessage.parse_obj(result["data"])
         return False
 
-    async def uploadGroupFile(self, group_id: int) -> T.Union[GroupFileSystem, bool]:
+    async def uploadGroupFile(self, group_id: int, file: str, name: str):
+        result = await fetch.http_post(f"{self.baseurl_http}/upload_group_file", {
+            "group_id": group_id,
+            "file": file,
+            "name": name
+        }, params=self.protocol_params)
+        if result["status"] == "ok":
+            return True
+        return False
+
+    async def getGroupFileSystemInfo(self, group_id: int) -> T.Union[GroupFileSystem, bool]:
         result = await fetch.http_post(f"{self.baseurl_http}/get_group_file_system_info", {
             "group_id": group_id
         }, params=self.protocol_params)
